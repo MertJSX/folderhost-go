@@ -1,9 +1,9 @@
 package types
 
 type Account struct {
-	Name       string               `yaml:"name"`
-	Password   string               `yaml:"password"`
-	Permission []AccountPermissions `yaml:"permissions"`
+	Name        string               `yaml:"name"`
+	Password    string               `yaml:"password"`
+	Permissions []AccountPermissions `yaml:"permissions"`
 }
 
 type AccountPermissions struct {
