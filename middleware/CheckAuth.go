@@ -7,24 +7,51 @@ import (
 
 func CheckAuth(c *fiber.Ctx) error {
 	var body map[string]interface{}
+	var controlPassword bool = false
+	var username string = ""
+	var password string = ""
+	var err error
 
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(400).JSON(fiber.Map{"err": "Bad request"})
 	}
 
-	if body["username"].(string) == "" || body["password"].(string) == "" {
-		if body["token"].(string) == "" || c.Get("token") == "" {
-			return c.JSON(
-				fiber.Map{"err": "Bad request!"},
-			)
+	token, hasToken := body["token"].(string)
+	if !hasToken {
+		token = c.Get("token")
+	}
+
+	reqUsername, hasUsername := body["username"].(string)
+	reqPassword, hasPassword := body["password"].(string)
+
+	if token == "" && (!hasUsername || !hasPassword || reqUsername == "" || reqPassword == "") {
+		return c.Status(400).JSON(fiber.Map{"err": "Bad request! Authentication required"})
+	}
+
+	if token != "" {
+		username, err = utils.VerifyToken(token, utils.GetConfig().SecretJwtKey)
+		if err != nil {
+			return c.Status(401).JSON(fiber.Map{"err": "Invalid token"})
 		}
-	}
-
-	if body["token"].(string) != "" {
-		username, _ := utils.VerifyToken(body["token"].(string), utils.GetConfig().SecretJwtKey)
-
 		c.Locals("username", username)
+	} else {
+		username = reqUsername
+		password = reqPassword
+		controlPassword = true
 	}
 
-	return c.Next()
+	accounts := utils.GetConfig().Accounts
+	for _, v := range accounts {
+		if v.Name != username {
+			continue
+		}
+		if controlPassword && password != v.Password {
+			return c.Status(401).JSON(fiber.Map{"err": "Wrong password!"})
+		}
+
+		c.Locals("account", v)
+		return c.Next()
+	}
+
+	return c.Status(404).JSON(fiber.Map{"err": "Account not found"})
 }
