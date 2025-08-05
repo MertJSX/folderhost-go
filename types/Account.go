@@ -1,21 +1,21 @@
 package types
 
 type Account struct {
-	Name        string               `yaml:"name"`
-	Password    string               `yaml:"password"`
-	Permissions []AccountPermissions `yaml:"permissions"`
+	Name        string             `yaml:"name"`
+	Password    string             `yaml:"password"`
+	Permissions AccountPermissions `yaml:"permissions"`
 }
 
 type AccountPermissions struct {
-	ReadDirectories bool `yaml:"read_directories"`
-	ReadFiles       bool `yaml:"read_files"`
-	Create          bool `yaml:"create"`
-	Change          bool `yaml:"change"`
-	Delete          bool `yaml:"delete"`
-	Move            bool `yaml:"move"`
-	DownloadFiles   bool `yaml:"download"`
-	UploadFiles     bool `yaml:"upload"`
-	Rename          bool `yaml:"rename"`
-	Unzip           bool `yaml:"unzip"`
-	Copy            bool `yaml:"copy"`
+	ReadDirectories bool `yaml:"read_directories" json:"read_directories"`
+	ReadFiles       bool `yaml:"read_files" json:"read_files"`
+	Create          bool `yaml:"create" json:"create"`
+	Change          bool `yaml:"change" json:"change"`
+	Delete          bool `yaml:"delete" json:"delete"`
+	Move            bool `yaml:"move" json:"move"`
+	DownloadFiles   bool `yaml:"download" json:"download"`
+	UploadFiles     bool `yaml:"upload" json:"upload"`
+	Rename          bool `yaml:"rename" json:"rename"`
+	Unzip           bool `yaml:"unzip" json:"unzip"`
+	Copy            bool `yaml:"copy" json:"copy"`
 }
