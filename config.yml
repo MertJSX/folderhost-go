@@ -2,7 +2,7 @@
 port: 5000
 
 # This is folder path. You can change it, but don't delete.
-folder: "./testdir"
+folder: "./testdir/folderexample"
 
 # Limit of the folder. Examples: 10 GB, 300 MB, 5.5 GB, 1 TB...
 # You can remove it if you trust users.
@@ -19,10 +19,10 @@ accounts:
     # All users should have unique name
     - name: "admin"
       # user password
-      password: "12345"
+      password: "123"
       # You can manage user permissions.
       permissions:
-      - read_directories: true
+        read_directories: true
         read_files: true
         create: true
         change: true
@@ -36,7 +36,7 @@ accounts:
     - name: "moderator"
       password: "123"
       permissions:
-      - read_directories: true
+        read_directories: true
         read_files: true
         create: false
         change: false
