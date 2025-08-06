@@ -9,41 +9,58 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 )
 
-func GetDirectoryItems(DirectoryPath string, Mode string, Config types.ConfigFile) {
+func GetDirectoryItems(directoryPath string, mode string, config types.ConfigFile) []types.DirectoryItem {
 	var directoryItems []types.DirectoryItem
-	var id int
+	var id int = 0
 
-	err := filepath.Walk(DirectoryPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		fmt.Println("-----------------")
-		fmt.Printf("Path: %s\n", path)
-		fmt.Printf("Parent Path: %s\n", GetParentPath(path))
-		fmt.Printf("Name: %s\n", info.Name())
-		fmt.Printf("IsDirectory %t\n", info.IsDir())
-		fmt.Printf("Size %s\n", ConvertBytesToString(info.Size()))
-		fmt.Printf("Date modified: %s\n", info.ModTime())
-		fmt.Println("-----------------")
-		var DirectoryItem types.DirectoryItem = types.DirectoryItem{
-			Id:           id,
-			Name:         info.Name(),
-			ParentPath:   GetParentPath(path),
-			IsDirectory:  info.IsDir(),
-			Path:         path,
-			DateModified: info.ModTime(),
-			Size:         ConvertBytesToString(info.Size()),
-			SizeBytes:    info.Size(),
-		}
-
-		directoryItems = append(directoryItems, DirectoryItem)
-
-		id++
-
-		return nil
-	})
+	// Open the directory
+	dir, err := os.Open(directoryPath)
 	if err != nil {
-		log.Fatalf("Error while Getting directory items of path %s", DirectoryPath)
+		log.Printf("Error opening directory %s: %v", directoryPath, err)
+		return nil
+	}
+	defer dir.Close()
+
+	// Read only the immediate directory contents (non-recursive)
+	files, err := dir.Readdir(-1) // -1 means return all entries
+	if err != nil {
+		log.Printf("Error reading directory %s: %v", directoryPath, err)
+		return nil
 	}
 
+	for _, file := range files {
+		fullPath := filepath.Join(directoryPath, file.Name())
+		parentPath := GetParentPath(fullPath)
+
+		fmt.Printf("Parent path: %s\n", parentPath)
+
+		parentPath = ReplaceHostPrefix(parentPath, config)
+
+		if parentPath[len(parentPath)-1] != '/' {
+			parentPath += "/"
+		}
+
+		// if parentPath == config.Folder {
+		// 	parentPath = "./"
+		// } else {
+		// 	fmt.Println("Matches 2")
+		// 	parentPath = ReplacePathPrefix(parentPath, config.Folder+"/")
+		// }
+
+		directoryItem := types.DirectoryItem{
+			Id:           id,
+			Name:         file.Name(),
+			ParentPath:   parentPath,
+			IsDirectory:  file.IsDir(),
+			Path:         fmt.Sprintf("%s%s", parentPath, file.Name()),
+			DateModified: file.ModTime(),
+			Size:         ConvertBytesToString(file.Size()),
+			SizeBytes:    file.Size(),
+		}
+
+		directoryItems = append(directoryItems, directoryItem)
+		id++
+	}
+
+	return directoryItems
 }
