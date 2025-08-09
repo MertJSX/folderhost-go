@@ -16,7 +16,7 @@ secret_jwt_key: "you must change it" # Example: 5asdasd1asd
 
 # You can create your own accounts for access
 accounts:
-    # All users should have unique name
+    # All users must have unique name
     - name: "admin"
       # user password
       password: "123"

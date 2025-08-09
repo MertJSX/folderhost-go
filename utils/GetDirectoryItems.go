@@ -40,13 +40,6 @@ func GetDirectoryItems(directoryPath string, mode string, config types.ConfigFil
 			parentPath += "/"
 		}
 
-		// if parentPath == config.Folder {
-		// 	parentPath = "./"
-		// } else {
-		// 	fmt.Println("Matches 2")
-		// 	parentPath = ReplacePathPrefix(parentPath, config.Folder+"/")
-		// }
-
 		directoryItem := types.DirectoryItem{
 			Id:           id,
 			Name:         file.Name(),
