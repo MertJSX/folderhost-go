@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -12,6 +13,7 @@ import (
 
 func ReadDirectory(c *fiber.Ctx) error {
 	var body map[string]interface{}
+	start := time.Now()
 
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(400).JSON(fiber.Map{"err": "Bad request"})
@@ -42,7 +44,6 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	var config types.ConfigFile = utils.GetConfig()
 	var dirPath string = fmt.Sprintf("%s%s", config.Folder, path)
-	// var fsys fs.FS = os.DirFS("./")
 	directoryData, err := os.Stat(dirPath)
 
 	if err != nil {
@@ -76,29 +77,15 @@ func ReadDirectory(c *fiber.Ctx) error {
 	cleanedPath := filepath.Clean(trimmedPath())
 	folderName := filepath.Base(cleanedPath)
 	dirPath = utils.ReplacePathPrefix(dirPath, fmt.Sprintf("%s/", config.Folder))
-	var directoryInfo types.DirectoryItem
 
-	if mode() == "Optimized mode" {
-		directoryInfo = types.DirectoryItem{
-			Name:         folderName,
-			ParentPath:   utils.GetParentPath(dirPath),
-			Path:         dirPath,
-			IsDirectory:  directoryData.IsDir(),
-			DateModified: directoryData.ModTime(),
-			Size:         "N/A",
-			SizeBytes:    directoryData.Size(),
-		}
-	} else {
-		dirSizeBytes, dirSize, _ := utils.GetDirectorySize(fmt.Sprintf("%s%s", config.Folder, path))
-		directoryInfo = types.DirectoryItem{
-			Name:         folderName,
-			ParentPath:   utils.GetParentPath(dirPath),
-			Path:         dirPath,
-			IsDirectory:  directoryData.IsDir(),
-			DateModified: directoryData.ModTime(),
-			Size:         dirSize,
-			SizeBytes:    dirSizeBytes,
-		}
+	directoryInfo := types.DirectoryItem{
+		Name:         folderName,
+		ParentPath:   utils.GetParentPath(dirPath),
+		Path:         dirPath,
+		IsDirectory:  directoryData.IsDir(),
+		DateModified: directoryData.ModTime(),
+		Size:         "N/A",
+		SizeBytes:    directoryData.Size(),
 	}
 
 	if config.StorageLimit != "" {
@@ -107,8 +94,14 @@ func ReadDirectory(c *fiber.Ctx) error {
 		directoryInfo.StorageLimit = "UNLIMITED"
 	}
 
-	var data []types.DirectoryItem = utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode(), config)
+	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode(), config)
 
+	if mainDirectorySize != 0 {
+		directoryInfo.SizeBytes = mainDirectorySize
+		directoryInfo.Size = utils.ConvertBytesToString(mainDirectorySize)
+	}
+
+	fmt.Printf("%s, execution time %s\n", "Read directory", time.Since(start))
 	return c.JSON(
 		fiber.Map{
 			"data":          data,
