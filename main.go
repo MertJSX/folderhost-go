@@ -12,16 +12,14 @@ import (
 )
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		BodyLimit: 1000 * 1024 * 1024, // 1 GB
+	})
 	app.Use(cors.New())
 
 	config := utils.GetConfig()
 
 	var PORT string = fmt.Sprintf(":%d", config.Port)
-
-	_, dirSize, _ := utils.GetDirectorySize(config.Folder)
-
-	fmt.Printf("%s \n", dirSize)
 
 	app.Use("/api", func(c *fiber.Ctx) error {
 		return middleware.CheckAuth(c)
@@ -37,6 +35,10 @@ func main() {
 
 	app.Post("/api/download", func(c *fiber.Ctx) error {
 		return routes.Download(c)
+	})
+
+	app.Post("/api/upload", func(c *fiber.Ctx) error {
+		return routes.Upload(c)
 	})
 
 	app.Static("/", "client")
