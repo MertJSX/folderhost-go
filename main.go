@@ -35,6 +35,10 @@ func main() {
 		return routes.ReadDirectory(c)
 	})
 
+	app.Post("/api/download", func(c *fiber.Ctx) error {
+		return routes.Download(c)
+	})
+
 	app.Static("/", "client")
 
 	app.Get("*", func(c *fiber.Ctx) error {
