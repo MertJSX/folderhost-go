@@ -11,12 +11,12 @@ func CheckAuth(c *fiber.Ctx) error {
 	var username string = ""
 	var password string = ""
 	var err error
+	var token string
 
-	if err := c.BodyParser(&body); err != nil {
-		return c.Status(400).JSON(fiber.Map{"err": "Bad request"})
-	}
+	c.BodyParser(&body)
 
 	token, hasToken := body["token"].(string)
+
 	if !hasToken {
 		token = c.Get("token")
 	}
