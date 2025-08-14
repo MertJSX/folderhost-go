@@ -13,7 +13,7 @@ import (
 
 func main() {
 	app := fiber.New(fiber.Config{
-		BodyLimit: 1000 * 1024 * 1024, // 1 GB
+		BodyLimit: 15 * 1024 * 1024, // 15 MB
 	})
 	app.Use(cors.New())
 
@@ -38,7 +38,7 @@ func main() {
 	})
 
 	app.Post("/api/upload", func(c *fiber.Ctx) error {
-		return routes.Upload(c)
+		return routes.ChunkedUpload(c)
 	})
 
 	app.Static("/", "client")

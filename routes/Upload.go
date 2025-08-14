@@ -2,7 +2,10 @@ package routes
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
+	"strconv"
 
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -52,4 +55,90 @@ func Upload(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"response": "Successfully uploaded!",
 	})
+}
+
+func ChunkedUpload(c *fiber.Ctx) error {
+	config := utils.GetConfig()
+	targetPath := c.Query("path", "")
+	if targetPath == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"err": "Missing path query",
+		})
+	}
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(500).SendString("Couldn't read form: " + err.Error())
+	}
+	defer form.RemoveAll()
+
+	fileID := c.FormValue("fileID")
+	chunkIndex := c.FormValue("chunkIndex")
+	totalChunks := c.FormValue("totalChunks")
+	fileName := c.FormValue("fileName") // Orijinal dosya adı
+
+	// Save chunk as temp file
+	chunkPath := filepath.Join("./tmp", fileID+"_"+chunkIndex)
+	chunkFile, err := form.File["file"][0].Open()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Couldn't open chunk",
+		})
+	}
+	defer chunkFile.Close()
+
+	outFile, err := os.Create(chunkPath)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Couldn't create chunk file",
+		})
+	}
+	defer outFile.Close()
+
+	if _, err := io.Copy(outFile, chunkFile); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Couldn't save chunk",
+		})
+	}
+
+	// Merge all chunks
+	currentChunk, _ := strconv.Atoi(chunkIndex)
+	total, _ := strconv.Atoi(totalChunks)
+	if currentChunk == total-1 { // If it's the last chunk
+		finalPath := filepath.Join(config.Folder, targetPath, fileName)
+		if err := mergeChunks(fileID, finalPath, total); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"err": "Error uploading file",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"response": "Successfully uploaded!",
+		})
+	}
+
+	return c.SendString(fmt.Sprintf("Uploaded chunk %s", chunkIndex))
+}
+
+func mergeChunks(fileID, outputPath string, totalChunks int) error {
+	outFile, err := os.Create(outputPath)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	for i := 0; i < totalChunks; i++ {
+		chunkPath := filepath.Join("./tmp", fmt.Sprintf("%s_%d", fileID, i))
+		chunkData, err := os.Open(chunkPath)
+		if err != nil {
+			return fmt.Errorf("chunk %d couldn't find: %v", i, err)
+		}
+
+		if _, err := io.Copy(outFile, chunkData); err != nil {
+			chunkData.Close()
+			return fmt.Errorf("chunk %d couldn't write: %v", i, err)
+		}
+		chunkData.Close()
+		os.Remove(chunkPath)
+	}
+	return nil
 }
