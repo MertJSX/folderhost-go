@@ -13,11 +13,12 @@ import (
 
 func main() {
 	app := fiber.New(fiber.Config{
-		BodyLimit: 15 * 1024 * 1024, // 15 MB
+		BodyLimit: 1000 * 1024 * 1024, // 1 GB
 	})
 	app.Use(cors.New())
 
 	config := utils.GetConfig()
+	utils.Setup()
 
 	var PORT string = fmt.Sprintf(":%d", config.Port)
 
