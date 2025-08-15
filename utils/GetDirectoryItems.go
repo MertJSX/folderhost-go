@@ -19,7 +19,7 @@ func GetDirectoryItems(directoryPath string, mode string, config types.ConfigFil
 	var directoryItems []types.DirectoryItem
 	var directoryIDs []directoryID
 
-	fmt.Printf("Mode: %s\n", mode)
+	// fmt.Printf("Mode: %s\n", mode)
 
 	// Open the directory
 	dir, err := os.Open(directoryPath)
@@ -80,8 +80,6 @@ func GetDirectoryItems(directoryPath string, mode string, config types.ConfigFil
 		}()
 
 		for result := range ch {
-			fmt.Printf("Path: %s\n", directoryItems[result.Id].Path)
-			fmt.Printf("Size: %s\n", result.Size)
 			directoryItems[result.Id].Size = result.Size
 			directoryItems[result.Id].SizeBytes = result.SizeBytes
 		}
