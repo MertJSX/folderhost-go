@@ -9,21 +9,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func GetConfig() types.ConfigFile {
+var Config types.ConfigFile
+
+func GetConfig() {
 	fileData, err := resources.DefaultConfig.ReadFile("default_config.yml")
 
 	if err != nil {
 		log.Fatalf("Error reading embedded file: %s", err)
 	}
 
-	var config types.ConfigFile
-
-	err = yaml.Unmarshal(fileData, &config)
+	err = yaml.Unmarshal(fileData, &Config)
 	if err != nil {
 		log.Fatalf("Config.yml parse error: %v", err)
 	}
 
-	config.Folder = strings.TrimPrefix(config.Folder, "./")
-
-	return config
+	Config.Folder = strings.TrimPrefix(Config.Folder, "./")
 }

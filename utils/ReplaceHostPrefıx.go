@@ -3,12 +3,10 @@ package utils
 import (
 	"fmt"
 	"regexp"
-
-	"github.com/MertJSX/folder-host-go/types"
 )
 
-func ReplaceHostPrefix(input string, config types.ConfigFile) string {
-	pattern := regexp.MustCompile(fmt.Sprintf(`(^|\/)%s(\/|$)`, config.Folder))
+func ReplaceHostPrefix(input string) string {
+	pattern := regexp.MustCompile(fmt.Sprintf(`(^|\/)%s(\/|$)`, Config.Folder))
 
 	if pattern.MatchString(input) {
 		return pattern.ReplaceAllString(input, "${1}./")

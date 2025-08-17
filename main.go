@@ -17,10 +17,10 @@ func main() {
 	})
 	app.Use(cors.New())
 
-	config := utils.GetConfig()
+	utils.GetConfig()
 	utils.Setup()
 
-	var PORT string = fmt.Sprintf(":%d", config.Port)
+	var PORT string = fmt.Sprintf(":%d", utils.Config.Port)
 
 	app.Use("/api", func(c *fiber.Ctx) error {
 		return middleware.CheckAuth(c)

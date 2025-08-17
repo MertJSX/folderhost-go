@@ -42,7 +42,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		path += "/"
 	}
 
-	var config types.ConfigFile = utils.GetConfig()
+	config := &utils.Config
 	var dirPath string = fmt.Sprintf("%s%s", config.Folder, path)
 	directoryData, err := os.Stat(dirPath)
 
@@ -94,7 +94,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		directoryInfo.StorageLimit = "UNLIMITED"
 	}
 
-	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode(), config)
+	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode())
 
 	if mainDirectorySize != 0 {
 		directoryInfo.SizeBytes = mainDirectorySize

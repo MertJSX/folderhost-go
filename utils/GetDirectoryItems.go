@@ -15,11 +15,9 @@ type directoryID struct {
 	fullPath string
 }
 
-func GetDirectoryItems(directoryPath string, mode string, config types.ConfigFile) ([]types.DirectoryItem, int64) {
+func GetDirectoryItems(directoryPath string, mode string) ([]types.DirectoryItem, int64) {
 	var directoryItems []types.DirectoryItem
 	var directoryIDs []directoryID
-
-	// fmt.Printf("Mode: %s\n", mode)
 
 	// Open the directory
 	dir, err := os.Open(directoryPath)
@@ -39,7 +37,7 @@ func GetDirectoryItems(directoryPath string, mode string, config types.ConfigFil
 	for i, file := range files {
 		fullPath := filepath.Join(directoryPath, file.Name())
 		parentPath := GetParentPath(fullPath)
-		parentPath = ReplaceHostPrefix(parentPath, config)
+		parentPath = ReplaceHostPrefix(parentPath)
 		if parentPath[len(parentPath)-1] != '/' {
 			parentPath += "/"
 		}

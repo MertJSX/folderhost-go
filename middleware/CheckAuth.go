@@ -29,7 +29,7 @@ func CheckAuth(c *fiber.Ctx) error {
 	}
 
 	if token != "" {
-		username, err = utils.VerifyToken(token, utils.GetConfig().SecretJwtKey)
+		username, err = utils.VerifyToken(token, utils.Config.SecretJwtKey)
 		if err != nil {
 			return c.Status(401).JSON(fiber.Map{"err": "Invalid token"})
 		}
@@ -40,8 +40,8 @@ func CheckAuth(c *fiber.Ctx) error {
 		controlPassword = true
 	}
 
-	accounts := utils.GetConfig().Accounts
-	for _, v := range accounts {
+	config := &utils.Config
+	for _, v := range config.Accounts {
 		if v.Name != username {
 			continue
 		}

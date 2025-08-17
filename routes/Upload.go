@@ -6,13 +6,14 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
 
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Upload(c *fiber.Ctx) error {
-	config := utils.GetConfig()
+	config := &utils.Config
 	targetPath := c.Query("path", "")
 	if targetPath == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -58,7 +59,7 @@ func Upload(c *fiber.Ctx) error {
 }
 
 func ChunkedUpload(c *fiber.Ctx) error {
-	config := utils.GetConfig()
+	config := &utils.Config
 	targetPath := c.Query("path", "")
 	if targetPath == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -75,7 +76,7 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	fileID := c.FormValue("fileID")
 	chunkIndex := c.FormValue("chunkIndex")
 	totalChunks := c.FormValue("totalChunks")
-	fileName := c.FormValue("fileName") // Orijinal dosya adı
+	fileName := c.FormValue("fileName")
 
 	// Save chunk as temp file
 	chunkPath := filepath.Join("./tmp", fileID+"_"+chunkIndex)
@@ -95,7 +96,22 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	}
 	defer outFile.Close()
 
-	if _, err := io.Copy(outFile, chunkFile); err != nil {
+	chunkContent, _ := utils.FileToString(chunkFile)
+
+	ch := make(chan error, 1)
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go utils.CreateFileAsync(chunkPath, chunkContent, &wg, ch)
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	err = <-ch
+
+	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"err": "Couldn't save chunk",
 		})
@@ -113,10 +129,13 @@ func ChunkedUpload(c *fiber.Ctx) error {
 		}
 		return c.JSON(fiber.Map{
 			"response": "Successfully uploaded!",
+			"uploaded": true,
 		})
 	}
 
-	return c.SendString(fmt.Sprintf("Uploaded chunk %s", chunkIndex))
+	return c.JSON(fiber.Map{
+		"response": fmt.Sprintf("Uploaded chunk %s", chunkIndex),
+	})
 }
 
 func mergeChunks(fileID, outputPath string, totalChunks int) error {
@@ -130,12 +149,12 @@ func mergeChunks(fileID, outputPath string, totalChunks int) error {
 		chunkPath := filepath.Join("./tmp", fmt.Sprintf("%s_%d", fileID, i))
 		chunkData, err := os.Open(chunkPath)
 		if err != nil {
-			return fmt.Errorf("chunk %d couldn't find: %v", i, err)
+			return fmt.Errorf("couldn't find chunk %d: %v", i, err)
 		}
 
 		if _, err := io.Copy(outFile, chunkData); err != nil {
 			chunkData.Close()
-			return fmt.Errorf("chunk %d couldn't write: %v", i, err)
+			return fmt.Errorf("couldn't write chunk %d: %v", i, err)
 		}
 		chunkData.Close()
 		os.Remove(chunkPath)

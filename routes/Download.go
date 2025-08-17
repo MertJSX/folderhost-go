@@ -17,7 +17,7 @@ func Download(c *fiber.Ctx) error {
 		)
 	}
 
-	config := utils.GetConfig()
+	config := &utils.Config
 	path := c.Query("filepath")
 	filepath := fmt.Sprintf("%s%s", config.Folder, path)
 

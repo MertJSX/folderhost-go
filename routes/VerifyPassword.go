@@ -7,7 +7,7 @@ import (
 )
 
 func VerifyPassword(c *fiber.Ctx) error {
-	config := utils.GetConfig()
+	config := &utils.Config
 
 	for i := range len(config.Accounts) {
 		if c.Locals("account").(types.Account).Name == config.Accounts[i].Name {
