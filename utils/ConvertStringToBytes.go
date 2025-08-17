@@ -7,7 +7,7 @@ import (
 )
 
 // Missing possible error handlings... But still should work...
-func ConvertStringToBytes(size string) int {
+func ConvertStringToBytes(size string) int64 {
 	sizes := []string{"Bytes", "KB", "MB", "GB", "TB"}
 
 	parts := strings.Split(size, " ")
@@ -24,6 +24,6 @@ func ConvertStringToBytes(size string) int {
 		return 0
 	}
 
-	return int(value * math.Pow(1024, float64(index)))
+	return int64(value * math.Pow(1024, float64(index)))
 
 }
