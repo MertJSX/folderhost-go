@@ -17,8 +17,8 @@ func main() {
 	})
 	app.Use(cors.New())
 
-	utils.GetConfig()
 	utils.Setup()
+	utils.GetConfig()
 
 	var PORT string = fmt.Sprintf(":%d", utils.Config.Port)
 
@@ -40,6 +40,10 @@ func main() {
 
 	app.Post("/api/upload", func(c *fiber.Ctx) error {
 		return routes.ChunkedUpload(c)
+	})
+
+	app.Post("/api/delete", func(c *fiber.Ctx) error {
+		return routes.Delete(c)
 	})
 
 	app.Static("/", "client")

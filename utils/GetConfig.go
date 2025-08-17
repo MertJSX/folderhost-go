@@ -2,9 +2,9 @@ package utils
 
 import (
 	"log"
+	"os"
 	"strings"
 
-	"github.com/MertJSX/folder-host-go/resources"
 	"github.com/MertJSX/folder-host-go/types"
 	"gopkg.in/yaml.v3"
 )
@@ -12,10 +12,11 @@ import (
 var Config types.ConfigFile
 
 func GetConfig() {
-	fileData, err := resources.DefaultConfig.ReadFile("default_config.yml")
+	// fileData, err := resources.DefaultConfig.ReadFile("default_config.yml")
+	fileData, err := os.ReadFile("./config.yml")
 
 	if err != nil {
-		log.Fatalf("Error reading embedded file: %s", err)
+		log.Fatalf("Error reading config file: %s", err)
 	}
 
 	err = yaml.Unmarshal(fileData, &Config)
