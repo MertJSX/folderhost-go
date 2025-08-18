@@ -46,6 +46,10 @@ func main() {
 		return routes.Delete(c)
 	})
 
+	app.Post("/api/rename", func(c *fiber.Ctx) error {
+		return routes.Rename(c)
+	})
+
 	app.Static("/", "client")
 
 	app.Get("*", func(c *fiber.Ctx) error {
