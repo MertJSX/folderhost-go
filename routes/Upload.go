@@ -60,7 +60,7 @@ func Upload(c *fiber.Ctx) error {
 
 func ChunkedUpload(c *fiber.Ctx) error {
 	config := &utils.Config
-	targetPath := c.Query("path", "")
+	targetPath := c.Query("path")
 	if targetPath == "" {
 		return c.Status(400).JSON(fiber.Map{
 			"err": "Missing path query",
@@ -77,6 +77,10 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	chunkIndex := c.FormValue("chunkIndex")
 	totalChunks := c.FormValue("totalChunks")
 	fileName := c.FormValue("fileName")
+	total, _ := strconv.ParseInt(totalChunks, 10, 64)
+	// fileSize := total * form.File["file"][0].Size
+
+	// mainFolderSize := utils.GetDirectorySizeAsync()
 
 	// Save chunk as temp file
 	chunkPath := filepath.Join("./tmp", fileID+"_"+chunkIndex)
@@ -119,10 +123,9 @@ func ChunkedUpload(c *fiber.Ctx) error {
 
 	// Merge all chunks
 	currentChunk, _ := strconv.Atoi(chunkIndex)
-	total, _ := strconv.Atoi(totalChunks)
-	if currentChunk == total-1 { // If it's the last chunk
+	if currentChunk == int(total)-1 { // If it's the last chunk
 		finalPath := filepath.Join(config.Folder, targetPath, fileName)
-		if err := mergeChunks(fileID, finalPath, total); err != nil {
+		if err := mergeChunks(fileID, finalPath, int(total)); err != nil {
 			return c.Status(500).JSON(fiber.Map{
 				"err": "Error uploading file",
 			})
