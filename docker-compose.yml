@@ -1,0 +1,21 @@
+services:
+  folderhost:
+    container_name: folderhost-go
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./testdir:/folderhost-go/testdir:z
+      - ./config.yml:/folderhost-go/config.yml:z
+    restart: unless-stopped
+  folderhost-client: # Service name
+    container_name: folderhost-client-v2
+    build: 
+      context: ./client # Dockerfile path
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client/src:/folderhost-client/src:z
+      - ./client/index.html:/folderhost-client/index.html:z
+      - ./client/public:/folderhost-client/public:z
+    restart: unless-stopped

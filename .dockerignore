@@ -1,0 +1,11 @@
+tmp
+recovery_bin
+.gitignore
+.git
+.gitmodules
+.dockerignore
+Dockerfile
+docker-compose.yml
+client/*
+!client/dist
+!client/dist/**
