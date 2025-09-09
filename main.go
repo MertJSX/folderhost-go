@@ -7,6 +7,7 @@ import (
 	_ "github.com/MertJSX/folder-host-go/resources"
 	"github.com/MertJSX/folder-host-go/routes"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -24,6 +25,18 @@ func main() {
 
 	app.Use("/api", func(c *fiber.Ctx) error {
 		return middleware.CheckAuth(c)
+	})
+
+	app.Use("/api/ws", func(c *fiber.Ctx) error {
+		return middleware.WsConnect(c)
+	})
+
+	app.Get("/api/ws/:path", websocket.New(func(c *websocket.Conn) {
+		middleware.HandleWebsocket(c)
+	}))
+
+	app.Post("/api/read-file", func(c *fiber.Ctx) error {
+		return routes.ReadFile(c)
 	})
 
 	app.Post("/api/verify-password", func(c *fiber.Ctx) error {
