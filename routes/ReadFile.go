@@ -1,0 +1,63 @@
+package routes
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/MertJSX/folder-host-go/types"
+	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/gofiber/fiber/v2"
+)
+
+func ReadFile(c *fiber.Ctx) error {
+	var path string
+	var fileName string
+	var lastModified string
+	var itemStat os.FileInfo
+	var err error
+	config := &utils.Config
+
+	if !c.Locals("account").(types.Account).Permissions.ReadFiles {
+		return c.Status(403).JSON(fiber.Map{"err": "No permission!"})
+	}
+
+	if c.Query("filepath") == "" {
+		return c.Status(400).JSON(fiber.Map{"err": "Bad request!"})
+	}
+
+	path = c.Query("filepath")
+
+	if utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.Folder, path)) {
+		return c.Status(200).JSON(fiber.Map{"err": "Filepath is not existing!"})
+	}
+
+	itemStat, err = os.Stat(fmt.Sprintf("%s%s", config.Folder, path))
+
+	fileName = itemStat.Name()
+	lastModified = itemStat.ModTime().GoString()
+
+	fmt.Printf("Filename: %s\n", fileName)
+	fmt.Printf("Last modified: %s\n", lastModified)
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"err": "Unknown server error!"})
+	}
+
+	if itemStat.IsDir() {
+		return c.Status(200).JSON(fiber.Map{"err": "Filepath is directory!"})
+	}
+
+	content, err := os.ReadFile(fmt.Sprintf("%s%s", config.Folder, path))
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"err": "Error while reading file!"})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"data":            string(content),
+		"res":             "Successfully readed!",
+		"title":           fileName,
+		"lastModified":    lastModified,
+		"writePermission": c.Locals("account").(types.Account).Permissions.Change,
+	})
+}
