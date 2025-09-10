@@ -16,24 +16,35 @@ func main() {
 	app := fiber.New(fiber.Config{
 		BodyLimit: 1000 * 1024 * 1024, // 1 GB
 	})
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:5173, http://localhost:3000",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
+		AllowCredentials: true,
+	}))
 
 	utils.Setup()
 	utils.GetConfig()
 
 	var PORT string = fmt.Sprintf(":%d", utils.Config.Port)
 
+	app.Use("/ws", func(c *fiber.Ctx) error {
+		// return middleware.WsConnect(c)
+		fmt.Println("Heresex")
+		if websocket.IsWebSocketUpgrade(c) {
+			return middleware.WsConnect(c)
+		}
+		// WebSocket değilse normal HTTP isteğine izin ver
+		return c.Next()
+	})
+
+	app.Get("/ws/:path", websocket.New(func(c *websocket.Conn) {
+		middleware.HandleWebsocket(c)
+	}))
+
 	app.Use("/api", func(c *fiber.Ctx) error {
 		return middleware.CheckAuth(c)
 	})
-
-	app.Use("/api/ws", func(c *fiber.Ctx) error {
-		return middleware.WsConnect(c)
-	})
-
-	app.Get("/api/ws/:path", websocket.New(func(c *websocket.Conn) {
-		middleware.HandleWebsocket(c)
-	}))
 
 	app.Post("/api/read-file", func(c *fiber.Ctx) error {
 		return routes.ReadFile(c)
