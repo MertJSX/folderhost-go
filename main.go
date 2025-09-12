@@ -17,10 +17,10 @@ func main() {
 		BodyLimit: 1000 * 1024 * 1024, // 1 GB
 	})
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:5173, http://localhost:3000",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
-		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
-		AllowCredentials: true,
+		//AllowOrigins:     "http://localhost:5173, http://85.187.7.67:5173",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
+		//AllowCredentials: true,
 	}))
 
 	utils.Setup()
@@ -29,12 +29,9 @@ func main() {
 	var PORT string = fmt.Sprintf(":%d", utils.Config.Port)
 
 	app.Use("/ws", func(c *fiber.Ctx) error {
-		// return middleware.WsConnect(c)
-		fmt.Println("Heresex")
 		if websocket.IsWebSocketUpgrade(c) {
 			return middleware.WsConnect(c)
 		}
-		// WebSocket değilse normal HTTP isteğine izin ver
 		return c.Next()
 	})
 
