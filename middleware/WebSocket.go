@@ -76,14 +76,14 @@ func HandleWebsocket(c *websocket.Conn) {
 	//log.Println(c.Locals("allowed")) // true
 	var path string = c.Params("path")
 
-	fmt.Printf("Path: %s\n", path)
-
 	path, _ = url.PathUnescape(path)
 	config := &utils.Config
 	path = fmt.Sprintf("%s%s", config.Folder, path)
 
 	utils.AddClient(c, path)
+	updateClientsCount(path)
 
+	defer updateClientsCount(path)
 	defer utils.RemoveClient(c)
 
 	var username string = c.Locals("username").(string)
@@ -101,7 +101,7 @@ func HandleWebsocket(c *websocket.Conn) {
 			break
 		}
 
-		utils.SendToAll(path, mt, msg, c)
+		utils.SendToAllExclude(path, mt, msg, c)
 
 		if err := processWebSocketMessage(msg, path, c); err != nil {
 			log.Println("Message processing error:", err)
@@ -110,6 +110,17 @@ func HandleWebsocket(c *websocket.Conn) {
 
 	log.Printf("WebSocket disconnected - User: %s, Path: %s", username, path)
 	c.Close()
+}
+
+func updateClientsCount(path string) {
+	clientsCount, err := json.Marshal(fiber.Map{
+		"type":  "editor-update-usercount",
+		"count": utils.GetClientsCount(path),
+	})
+
+	if err == nil {
+		utils.SendToAll(path, 1, clientsCount)
+	}
 }
 
 func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn) error {

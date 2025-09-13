@@ -24,7 +24,7 @@ func RemoveClient(conn *websocket.Conn) {
 	delete(clients, conn)
 }
 
-func SendToAll(path string, mt int, message []byte, exclude *websocket.Conn) {
+func SendToAllExclude(path string, mt int, message []byte, exclude *websocket.Conn) {
 	clientsMu.RLock()
 	defer clientsMu.RUnlock()
 
@@ -36,4 +36,31 @@ func SendToAll(path string, mt int, message []byte, exclude *websocket.Conn) {
 			conn.WriteMessage(mt, message)
 		}
 	}
+}
+
+func SendToAll(path string, mt int, message []byte) {
+	clientsMu.RLock()
+	defer clientsMu.RUnlock()
+
+	fmt.Println("Send to all operation")
+	for conn, clientPath := range clients {
+		fmt.Printf("Client: %s\n", clientPath)
+		if clientPath == path {
+			fmt.Println("Msg was sent!")
+			conn.WriteMessage(mt, message)
+		}
+	}
+}
+
+func GetClientsCount(path string) int {
+	clientsMu.RLock()
+	defer clientsMu.RUnlock()
+	count := 0
+	for _, clientPath := range clients {
+		if clientPath == path {
+			count++
+		}
+	}
+
+	return count
 }
