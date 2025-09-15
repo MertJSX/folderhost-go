@@ -7,3 +7,7 @@ func IsNotExistingPath(path string) bool {
 
 	return os.IsNotExist(err)
 }
+
+func IsExistingPath(path string) bool {
+	return !IsNotExistingPath(path)
+}
