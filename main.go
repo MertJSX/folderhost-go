@@ -62,6 +62,10 @@ func main() {
 		return routes.Delete(c)
 	})
 
+	app.Post("/api/create-copy", func(c *fiber.Ctx) error {
+		return routes.CreateCopy(c)
+	})
+
 	app.Post("/api/rename", func(c *fiber.Ctx) error {
 		return routes.Rename(c)
 	})
