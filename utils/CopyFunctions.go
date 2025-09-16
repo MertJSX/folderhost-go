@@ -8,13 +8,18 @@ import (
 	"syscall"
 )
 
-func CopyDirectory(scrDir, dest string) error {
-	entries, err := os.ReadDir(scrDir)
+func CopyDirectory(srcDir, dest string) error {
+	if err := CreateIfNotExists(dest, 0755); err != nil {
+		return err
+	}
+
+	entries, err := os.ReadDir(srcDir)
 	if err != nil {
 		return err
 	}
+
 	for _, entry := range entries {
-		sourcePath := filepath.Join(scrDir, entry.Name())
+		sourcePath := filepath.Join(srcDir, entry.Name())
 		destPath := filepath.Join(dest, entry.Name())
 
 		fileInfo, err := os.Stat(sourcePath)
@@ -29,9 +34,6 @@ func CopyDirectory(scrDir, dest string) error {
 
 		switch fileInfo.Mode() & os.ModeType {
 		case os.ModeDir:
-			if err := CreateIfNotExists(destPath, 0755); err != nil {
-				return err
-			}
 			if err := CopyDirectory(sourcePath, destPath); err != nil {
 				return err
 			}
