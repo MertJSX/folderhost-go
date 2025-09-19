@@ -10,8 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Existing problems that I will fix:
-// - You can't move the folder or file to recovery_bin if it already exists
 func Delete(c *fiber.Ctx) error {
 
 	if !c.Locals("account").(types.Account).Permissions.Delete {
@@ -67,8 +65,10 @@ func Delete(c *fiber.Ctx) error {
 
 	BinStorageLimit := utils.ConvertStringToBytes(config.BinStorageLimit)
 
+	itemToBeDeletedStat, _ := os.Stat(path)
+	isDirectory := itemToBeDeletedStat.IsDir()
+
 	if config.BinStorageLimit != "UNLIMITED" {
-		itemToBeDeletedStat, _ := os.Stat(path)
 		sizeOfItem := itemToBeDeletedStat.Size()
 		if itemToBeDeletedStat.IsDir() {
 			sizeOfItem, _, err = utils.GetDirectorySize(path)
@@ -89,7 +89,27 @@ func Delete(c *fiber.Ctx) error {
 		}
 	}
 
-	err = os.Rename(path, fmt.Sprintf("./recovery_bin/%s", itemName))
+	var (
+		originalName string = utils.GetPureFileName(itemName)
+		extName      string = filepath.Ext(itemName)
+		copyIndex    int    = 0
+		fullFileName string = originalName + extName
+	)
+
+	if isDirectory {
+		fullFileName = itemName
+		for utils.IsExistingPath(fmt.Sprintf("./recovery_bin/%s", fullFileName)) {
+			copyIndex++
+			fullFileName = fmt.Sprintf("%s (%d)", fullFileName, copyIndex)
+		}
+	} else {
+		for utils.IsExistingPath(fmt.Sprintf("./recovery_bin/%s", fullFileName)) {
+			copyIndex++
+			fullFileName = fmt.Sprintf("%s (%d)%s", originalName, copyIndex, extName)
+		}
+	}
+
+	err = os.Rename(path, fmt.Sprintf("./recovery_bin/%s", fullFileName))
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Error deleting item"})
