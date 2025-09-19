@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/MertJSX/folder-host-go/database"
 	"github.com/MertJSX/folder-host-go/middleware"
 	_ "github.com/MertJSX/folder-host-go/resources"
 	"github.com/MertJSX/folder-host-go/routes"
@@ -20,6 +21,8 @@ func main() {
 
 	utils.Setup()
 	utils.GetConfig()
+
+	database.InitializeDatabase()
 
 	var PORT string = fmt.Sprintf(":%d", utils.Config.Port)
 
