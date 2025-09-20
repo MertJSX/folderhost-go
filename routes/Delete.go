@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MertJSX/folder-host-go/database"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -47,6 +48,8 @@ func Delete(c *fiber.Ctx) error {
 		err := os.Remove(path)
 		if err == nil {
 			return c.Status(200).JSON(fiber.Map{"response": "Item was deleted successfully!"})
+		} else {
+			return c.Status(500).JSON(fiber.Map{"err": "Unknown error!"})
 		}
 	}
 
@@ -67,15 +70,15 @@ func Delete(c *fiber.Ctx) error {
 
 	itemToBeDeletedStat, _ := os.Stat(path)
 	isDirectory := itemToBeDeletedStat.IsDir()
+	sizeOfItem := itemToBeDeletedStat.Size()
+	if itemToBeDeletedStat.IsDir() {
+		sizeOfItem, _, err = utils.GetDirectorySize(path)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"err": "Unknown server error"})
+		}
+	}
 
 	if config.BinStorageLimit != "UNLIMITED" {
-		sizeOfItem := itemToBeDeletedStat.Size()
-		if itemToBeDeletedStat.IsDir() {
-			sizeOfItem, _, err = utils.GetDirectorySize(path)
-			if err != nil {
-				return c.Status(500).JSON(fiber.Map{"err": "Unknown server error"})
-			}
-		}
 		sizeOfRecoveryBin, _, err := utils.GetDirectorySize("./recovery_bin")
 
 		if err != nil {
@@ -113,6 +116,20 @@ func Delete(c *fiber.Ctx) error {
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Error deleting item"})
+	}
+
+	var recoveryRecord types.RecoveryRecord = types.RecoveryRecord{
+		Username:    c.Locals("account").(types.Account).Name,
+		OldLocation: path,
+		BinLocation: fmt.Sprintf("./recovery_bin/%s", fullFileName),
+		IsDirectory: isDirectory,
+		SizeDisplay: utils.ConvertBytesToString(sizeOfItem),
+		SizeBytes:   sizeOfItem,
+	}
+
+	if err = database.CreateRecoveryRecord(recoveryRecord); err != nil {
+		fmt.Printf("Error: %s", err)
+		return c.Status(500).JSON(fiber.Map{"err": "An error occurred during the creation of the recovery record. But the item was moved to the recovery bin."})
 	}
 
 	return c.Status(200).JSON(fiber.Map{"response": "Item was deleted successfully!"})
