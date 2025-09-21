@@ -73,7 +73,6 @@ func WsConnect(c *fiber.Ctx) error {
 }
 
 func HandleWebsocket(c *websocket.Conn) {
-	//log.Println(c.Locals("allowed")) // true
 	var path string = c.Params("path")
 
 	path, _ = url.PathUnescape(path)
@@ -101,9 +100,7 @@ func HandleWebsocket(c *websocket.Conn) {
 			break
 		}
 
-		utils.SendToAllExclude(path, mt, msg, c)
-
-		if err := processWebSocketMessage(msg, path, c); err != nil {
+		if err := processWebSocketMessage(msg, path, c, path, mt); err != nil {
 			log.Println("Message processing error:", err)
 		}
 	}
@@ -123,25 +120,45 @@ func updateClientsCount(path string) {
 	}
 }
 
-func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn) error {
+func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, path string, mt int) error {
 	var message types.EditorChange
 
 	if err := json.Unmarshal(msg, &message); err != nil {
 		return err
 	}
 
-	fmt.Printf("Change: %s\n", message.Change.Text)
-
-	fmt.Printf("Filepath: %s\n", filePath)
-
 	switch message.Type {
 	case "editor-change":
+		utils.SendToAllExclude(path, mt, msg, c)
 		return applyEditorChange(filePath, message.Change)
+	case "unzip":
+		fmt.Println("Unzip started")
+		handleUnzip(c, mt, message)
 	default:
-		log.Printf("Unknown message type: %s", message.Type)
+		log.Printf("Unknown message type: %s\n", message.Type)
 	}
 
 	return nil
+}
+
+func handleUnzip(c *websocket.Conn, mt int, message types.EditorChange) {
+	src := utils.Config.Folder + message.Path
+	dest := fmt.Sprintf("%s%s/%s", utils.Config.Folder, utils.GetParentPath(message.Path), utils.GetPureFileName(message.Path))
+
+	for index := 1; utils.IsExistingPath(dest); index++ {
+		dest = fmt.Sprintf("%s (%d)", dest, index)
+	}
+
+	utils.Unzip(src, dest, func(totalSize int64, isCompleted bool, abortMsg string) {
+		unzipProgress, _ := json.Marshal(fiber.Map{
+			"type":        "unzip-progress",
+			"totalSize":   utils.ConvertBytesToString(totalSize),
+			"isCompleted": isCompleted,
+			"abortMsg":    abortMsg,
+		})
+
+		c.WriteMessage(mt, unzipProgress)
+	})
 }
 
 func applyEditorChange(filePath string, change types.ChangeData) error {
