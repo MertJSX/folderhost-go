@@ -1,9 +1,11 @@
 package routes
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"syscall"
 	"time"
 
 	"github.com/MertJSX/folder-host-go/types"
@@ -46,24 +48,21 @@ func ReadDirectory(c *fiber.Ctx) error {
 	var dirPath string = fmt.Sprintf("%s%s", config.Folder, path)
 	directoryData, err := os.Stat(dirPath)
 
-	if err != nil {
-		fmt.Println("Error:")
-		fmt.Println(err)
-		return c.JSON(
-			fiber.Map{"err": "Unknown error!"},
+	if os.IsNotExist(err) {
+		return c.Status(400).JSON(
+			fiber.Map{"err": "Wrong dirpath!"},
 		)
 	}
 
-	_, err = os.Stat(dirPath)
-
-	// Validation to avoid errors
-	if os.IsNotExist(err) {
-		return c.JSON(
-			fiber.Map{"err": "Wrong dirpath!"},
+	if errors.Is(err, syscall.ENOTDIR) {
+		return c.Status(400).JSON(
+			fiber.Map{"err": "Dirpath is not a directory!"},
 		)
-	} else if !directoryData.IsDir() {
-		return c.JSON(
-			fiber.Map{"err": "Dirpath is not directory!"},
+	}
+
+	if err != nil {
+		return c.Status(400).JSON(
+			fiber.Map{"err": "Unknown error!"},
 		)
 	}
 
