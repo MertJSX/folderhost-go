@@ -16,6 +16,36 @@ func CheckAuth(c *fiber.Ctx) error {
 	c.BodyParser(&body)
 
 	token, hasToken := body["token"].(string)
+	path := c.Query("path")
+	folder := c.Query("folder")
+	itemName := c.Query("itemName")
+	filepath := c.Query("filepath")
+	oldFilepath := c.Query("oldFilepath")
+	newFilepath := c.Query("newFilepath")
+
+	if path != "" && !utils.IsSafePath(path) {
+		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+	}
+
+	if folder != "" && !utils.IsSafePath(folder) {
+		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+	}
+
+	if itemName != "" && !utils.IsSafePath(itemName) {
+		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+	}
+
+	if filepath != "" && !utils.IsSafePath(filepath) {
+		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+	}
+
+	if oldFilepath != "" && !utils.IsSafePath(oldFilepath) {
+		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+	}
+
+	if newFilepath != "" && !utils.IsSafePath(newFilepath) {
+		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+	}
 
 	if !hasToken {
 		token = c.Get("token")

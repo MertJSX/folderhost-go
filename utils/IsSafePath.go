@@ -1,16 +1,7 @@
 package utils
 
-import "path/filepath"
+import "strings"
 
-func IsSafePath(basePath, targetPath string) bool {
-	rel, err := filepath.Rel(basePath, targetPath)
-	if err != nil {
-		return false
-	}
-
-	if rel == ".." || len(rel) >= 2 && rel[:2] == ".." {
-		return false
-	}
-
-	return !filepath.IsAbs(rel)
+func IsSafePath(filePath string) bool {
+	return !strings.Contains(filePath, "..")
 }
