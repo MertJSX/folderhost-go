@@ -56,28 +56,21 @@ func WsConnect(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"error": "Account not found"})
 	}
 
-	var path string = c.Query("path")
-
-	fmt.Printf("Path: %s\n", path)
-
-	decodedPath, err := url.PathUnescape(path)
-	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid path"})
-	}
-
-	fmt.Printf("Decoded path: %s\n", decodedPath)
-
-	c.Locals("path", decodedPath)
-
 	return c.Next()
 }
 
 func HandleWebsocket(c *websocket.Conn) {
 	var path string = c.Params("path")
 
-	path, _ = url.PathUnescape(path)
+	path, err := url.PathUnescape(path)
+
+	if err != nil {
+		c.Close()
+		return
+	}
+
 	config := &utils.Config
-	path = fmt.Sprintf("%s%s", config.Folder, path)
+	path = config.Folder + path
 
 	utils.AddClient(c, path)
 	updateClientsCount(path)
@@ -91,7 +84,6 @@ func HandleWebsocket(c *websocket.Conn) {
 	var (
 		mt  int
 		msg []byte
-		err error
 	)
 
 	for {
@@ -100,7 +92,7 @@ func HandleWebsocket(c *websocket.Conn) {
 			break
 		}
 
-		if err := processWebSocketMessage(msg, path, c, path, mt); err != nil {
+		if err := processWebSocketMessage(msg, path, c, mt); err != nil {
 			log.Println("Message processing error:", err)
 		}
 	}
@@ -120,8 +112,9 @@ func updateClientsCount(path string) {
 	}
 }
 
-func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, path string, mt int) error {
+func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt int) error {
 	var message types.EditorChange
+	var account types.Account = c.Locals("account").(types.Account)
 
 	if err := json.Unmarshal(msg, &message); err != nil {
 		return err
@@ -129,10 +122,27 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, pat
 
 	switch message.Type {
 	case "editor-change":
-		utils.SendToAllExclude(path, mt, msg, c)
+		if !account.Permissions.Change {
+			permissionError, _ := json.Marshal(fiber.Map{
+				"type":  "error",
+				"error": "You don't have permission to change!",
+			})
+
+			c.WriteMessage(mt, permissionError)
+			return nil // Server doesn't care about permission errors
+		}
+		utils.SendToAllExclude(filePath, mt, msg, c)
 		return applyEditorChange(filePath, message.Change)
 	case "unzip":
-		fmt.Println("Unzip started")
+		if !account.Permissions.Unzip {
+			permissionError, _ := json.Marshal(fiber.Map{
+				"type":  "error",
+				"error": "You don't have permission to unzip!",
+			})
+
+			c.WriteMessage(mt, permissionError)
+			return nil // Server doesn't care about permission errors
+		}
 		handleUnzip(c, mt, message)
 	default:
 		log.Printf("Unknown message type: %s\n", message.Type)
