@@ -49,6 +49,9 @@ func CheckAuth(c *fiber.Ctx) error {
 
 	if !hasToken {
 		token = c.Get("token")
+		if token == "" {
+			token = c.Get("Authorization")
+		}
 	}
 
 	reqUsername, hasUsername := body["username"].(string)
