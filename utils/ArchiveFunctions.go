@@ -55,7 +55,7 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 func extractFile(file *zip.File, dest string, totalSize *int64, uid int, gid int) error {
 	filePath := filepath.Join(dest, file.Name)
 
-	if !IsSafePath(dest, filePath) {
+	if !IsSafePath(filePath) {
 		return fmt.Errorf("security risk: wrong filepath")
 	}
 
