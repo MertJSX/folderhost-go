@@ -24,6 +24,8 @@ func CreateUsersTable() {
         	copy_permission BOOLEAN DEFAULT FALSE,
 			logs_permission BOOLEAN DEFAULT FALSE,
 			recovery_permission BOOLEAN DEFAULT FALSE,
+			read_recovery_permission BOOLEAN DEFAULT FALSE,
+			use_recovery_permission BOOLEAN DEFAULT FALSE,
         	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 	`)

@@ -18,4 +18,6 @@ type AccountPermissions struct {
 	Rename          bool `yaml:"rename" json:"rename"`
 	Unzip           bool `yaml:"unzip" json:"unzip"`
 	Copy            bool `yaml:"copy" json:"copy"`
+	ReadRecovery    bool `yaml:"read_recovery" json:"read_recovery"`
+	UseRecovery     bool `yaml:"use_recovery" json:"use_recovery"`
 }

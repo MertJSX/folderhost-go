@@ -33,6 +33,8 @@ accounts:
         rename: true
         unzip: true
         copy: true
+        read_recovery: true
+        use_recovery: true
     - name: "moderator"
       password: "123"
       permissions:
@@ -47,12 +49,14 @@ accounts:
         rename: false
         unzip: false
         copy: false
+        read_recovery: true
+        use_recovery: false
 
 # Holds deleted files. Accidentally, you might delete files that you don't want to delete.
 recovery_bin: false
 
 # Optionally you can limit recovery_bin storage. You can remove it if you want.
-bin_storage_limit: "100 GB"
+bin_storage_limit: "10 GB"
 
 # Enable/Disable logging activities
 log_activities: true
