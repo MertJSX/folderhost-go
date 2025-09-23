@@ -41,7 +41,7 @@ func main() {
 		return middleware.CheckAuth(c)
 	})
 
-	app.Post("/api/read-file", func(c *fiber.Ctx) error {
+	app.Get("/api/read-file", func(c *fiber.Ctx) error {
 		return routes.ReadFile(c)
 	})
 
@@ -49,11 +49,11 @@ func main() {
 		return routes.VerifyPassword(c)
 	})
 
-	app.Post("/api/read-dir", func(c *fiber.Ctx) error {
+	app.Get("/api/read-dir", func(c *fiber.Ctx) error {
 		return routes.ReadDirectory(c)
 	})
 
-	app.Post("/api/download", func(c *fiber.Ctx) error {
+	app.Get("/api/download", func(c *fiber.Ctx) error {
 		return routes.Download(c)
 	})
 
@@ -61,19 +61,19 @@ func main() {
 		return routes.ChunkedUpload(c)
 	})
 
-	app.Post("/api/delete", func(c *fiber.Ctx) error {
+	app.Get("/api/delete", func(c *fiber.Ctx) error {
 		return routes.Delete(c)
 	})
 
-	app.Post("/api/create-item", func(c *fiber.Ctx) error {
+	app.Get("/api/create-item", func(c *fiber.Ctx) error {
 		return routes.CreateItem(c)
 	})
 
-	app.Post("/api/create-copy", func(c *fiber.Ctx) error {
+	app.Get("/api/create-copy", func(c *fiber.Ctx) error {
 		return routes.CreateCopy(c)
 	})
 
-	app.Post("/api/rename", func(c *fiber.Ctx) error {
+	app.Get("/api/rename", func(c *fiber.Ctx) error {
 		return routes.Rename(c)
 	})
 

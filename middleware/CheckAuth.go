@@ -15,7 +15,6 @@ func CheckAuth(c *fiber.Ctx) error {
 
 	c.BodyParser(&body)
 
-	token, hasToken := body["token"].(string)
 	path := c.Query("path")
 	folder := c.Query("folder")
 	itemName := c.Query("itemName")
@@ -24,47 +23,42 @@ func CheckAuth(c *fiber.Ctx) error {
 	newFilepath := c.Query("newFilepath")
 
 	if path != "" && !utils.IsSafePath(path) {
-		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+		return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 	}
 
 	if folder != "" && !utils.IsSafePath(folder) {
-		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+		return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 	}
 
 	if itemName != "" && !utils.IsSafePath(itemName) {
-		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+		return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 	}
 
 	if filepath != "" && !utils.IsSafePath(filepath) {
-		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+		return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 	}
 
 	if oldFilepath != "" && !utils.IsSafePath(oldFilepath) {
-		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+		return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 	}
 
 	if newFilepath != "" && !utils.IsSafePath(newFilepath) {
-		return c.Status(403).JSON(fiber.Map{"err": "Forbidden."})
+		return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 	}
 
-	if !hasToken {
-		token = c.Get("token")
-		if token == "" {
-			token = c.Get("Authorization")
-		}
-	}
+	token = c.Get("Authorization")
 
 	reqUsername, hasUsername := body["username"].(string)
 	reqPassword, hasPassword := body["password"].(string)
 
 	if token == "" && (!hasUsername || !hasPassword || reqUsername == "" || reqPassword == "") {
-		return c.Status(400).JSON(fiber.Map{"err": "Bad request! Authentication required"})
+		return c.Status(400).JSON(fiber.Map{"err": "Bad request! Authorization required"})
 	}
 
 	if token != "" {
 		username, err = utils.VerifyToken(token, utils.Config.SecretJwtKey)
 		if err != nil {
-			return c.Status(401).JSON(fiber.Map{"err": "Invalid token"})
+			return c.Status(401).JSON(fiber.Map{"err": "invalid token"})
 		}
 		c.Locals("username", username)
 	} else {
@@ -79,12 +73,12 @@ func CheckAuth(c *fiber.Ctx) error {
 			continue
 		}
 		if controlPassword && password != v.Password {
-			return c.Status(401).JSON(fiber.Map{"err": "Wrong password!"})
+			return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
 		}
 
 		c.Locals("account", v)
 		return c.Next()
 	}
 
-	return c.Status(404).JSON(fiber.Map{"err": "Account not found"})
+	return c.Status(404).JSON(fiber.Map{"err": "account not found"})
 }
