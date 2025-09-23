@@ -14,12 +14,7 @@ import (
 )
 
 func ReadDirectory(c *fiber.Ctx) error {
-	var body map[string]interface{}
 	start := time.Now()
-
-	if err := c.BodyParser(&body); err != nil {
-		return c.Status(400).JSON(fiber.Map{"err": "Bad request"})
-	}
 
 	if !c.Locals("account").(types.Account).Permissions.ReadFiles {
 		return c.JSON(
