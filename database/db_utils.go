@@ -124,7 +124,7 @@ func CreateRecoveryRecord(record types.RecoveryRecord) error {
 func SearchRecoveryRecords(limit, skip int) ([]types.RecoveryRecord, error) {
 	var foundList []types.RecoveryRecord
 	rows, err := DB.Query(`
-		SELECT * FROM recovery ORDER BY created_at ASC LIMIT ? OFFSET ?;
+		SELECT * FROM recovery ORDER BY created_at DESC LIMIT ? OFFSET ?;
 	`, limit, skip)
 
 	if err != nil {
