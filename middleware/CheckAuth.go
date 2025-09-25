@@ -52,7 +52,7 @@ func CheckAuth(c *fiber.Ctx) error {
 	reqPassword, hasPassword := body["password"].(string)
 
 	if token == "" && (!hasUsername || !hasPassword || reqUsername == "" || reqPassword == "") {
-		return c.Status(400).JSON(fiber.Map{"err": "Bad request! Authorization required"})
+		return c.Status(400).JSON(fiber.Map{"err": "authorization required"})
 	}
 
 	if token != "" {
