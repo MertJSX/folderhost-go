@@ -1,7 +1,7 @@
 package types
 
 type RecoveryRecord struct {
-	Id          int    `json:"id,omitempty"`
+	Id          int    `json:"id"`
 	Username    string `json:"username"`
 	OldLocation string `json:"oldLocation"`
 	BinLocation string `json:"binLocation"`

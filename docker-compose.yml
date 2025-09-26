@@ -5,6 +5,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
+      - ./database.db:/folderhost-go/database.db:z
+      - ./recovery_bin:/folderhost-go/recovery_bin:z
       - ./testdir:/folderhost-go/testdir:z
       - ./config.yml:/folderhost-go/config.yml:z
     restart: unless-stopped
