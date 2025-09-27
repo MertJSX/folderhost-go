@@ -9,9 +9,6 @@ import (
 )
 
 func CreateFileAsync(path string, content string, wg *sync.WaitGroup, ch chan<- error) {
-	// err := os.WriteFile(path, []byte(content), 0700)
-	// ch <- err
-
 	go func() {
 		defer wg.Done()
 		buf := make([]byte, 32*1024) // 32KB buffer
@@ -21,12 +18,5 @@ func CreateFileAsync(path string, content string, wg *sync.WaitGroup, ch chan<- 
 		writer := bufio.NewWriterSize(file, len(buf))
 		_, err := io.CopyBuffer(writer, bytes.NewReader([]byte(content)), buf)
 		ch <- err
-	}()
-}
-
-func CreateFileCallback(path string, content string, callback func(error)) {
-	go func() {
-		err := os.WriteFile(path, []byte(content), 0700)
-		callback(err)
 	}()
 }
