@@ -40,7 +40,7 @@ func CreateItem(c *fiber.Ctx) error {
 	}
 
 	if isFolder {
-		err = os.Mkdir(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName), 0644)
+		err = os.Mkdir(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName), 0777)
 		if err != nil {
 			return c.Status(500).JSON(
 				fiber.Map{"err": "Internal server error!"},
@@ -50,7 +50,7 @@ func CreateItem(c *fiber.Ctx) error {
 			fiber.Map{"err": "The folder was created successfully!"},
 		)
 	} else {
-		err = os.WriteFile(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName), nil, 0644)
+		err = os.WriteFile(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName), nil, 0777)
 		if err != nil {
 			return c.Status(500).JSON(
 				fiber.Map{"err": "Internal server error!"},
