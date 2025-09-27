@@ -121,6 +121,70 @@ func CreateRecoveryRecord(record types.RecoveryRecord) error {
 	return nil
 }
 
+func DeleteRecoveryRecord(id int) error {
+	tx, err := DB.Begin()
+	if err != nil {
+		log.Fatal(err)
+		return fmt.Errorf("Begin transaction error: %w", err)
+	}
+
+	stmt, err := tx.Prepare(`
+		DELETE FROM recovery WHERE id = ?;
+	`)
+
+	if err != nil {
+		return fmt.Errorf("error creating db stmt")
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		id,
+	)
+
+	if err != nil {
+		return fmt.Errorf("error executing db stmt")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("error commiting db changes")
+	}
+
+	return nil
+}
+
+func GetRecoveryRecord(id int) (types.RecoveryRecord, error) {
+	var record types.RecoveryRecord
+	rows, err := DB.Query(`
+		SELECT * FROM recovery WHERE id = ?;
+	`, id)
+
+	if err != nil {
+		return record, fmt.Errorf("error while getting recovery records: %v", err)
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(
+			&record.Id,
+			&record.Username,
+			&record.OldLocation,
+			&record.BinLocation,
+			&record.IsDirectory,
+			&record.SizeDisplay,
+			&record.SizeBytes,
+			&record.CreatedAt); err != nil {
+			fmt.Println(err)
+			return record, fmt.Errorf("error while getting recovery records: %v", err)
+		}
+	}
+
+	if err := rows.Err(); err != nil {
+		return record, fmt.Errorf("error while getting recovery records: %v", err)
+	}
+
+	return record, nil
+}
+
 func SearchRecoveryRecords(limit, skip int) ([]types.RecoveryRecord, error) {
 	var foundList []types.RecoveryRecord
 	rows, err := DB.Query(`

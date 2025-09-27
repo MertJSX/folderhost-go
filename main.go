@@ -81,6 +81,10 @@ func main() {
 		return routes.Recovery(c)
 	})
 
+	app.Get("/api/recover-item", func(c *fiber.Ctx) error {
+		return routes.RecoverItem(c)
+	})
+
 	app.Static("/", "client/dist")
 
 	app.Get("*", func(c *fiber.Ctx) error {

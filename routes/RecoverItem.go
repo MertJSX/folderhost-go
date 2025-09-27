@@ -1,0 +1,68 @@
+package routes
+
+import (
+	"os"
+	"strconv"
+
+	"github.com/MertJSX/folder-host-go/database"
+	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/gofiber/fiber/v2"
+)
+
+// Missing: Check for space requirements
+func RecoverItem(c *fiber.Ctx) error {
+	var id string = c.Query("id")
+	idToInt, err := strconv.Atoi(id)
+
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{
+			"err": "Bad request",
+		})
+	}
+
+	currentRecord, err := database.GetRecoveryRecord(idToInt)
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Error while getting record.",
+		})
+	}
+
+	if utils.IsExistingPath(currentRecord.OldLocation) {
+		return c.Status(400).JSON(fiber.Map{
+			"err": "There is existing item with the same name.",
+		})
+	}
+
+	if utils.Config.StorageLimit != "UNLIMITED" {
+		remainingFreeSpace := utils.GetRemainingFolderSpace()
+
+		if currentRecord.SizeBytes > remainingFreeSpace {
+			return c.Status(413).JSON(fiber.Map{"err": "This item exceeds the storage limit!"})
+		}
+	}
+
+	if err = os.Rename(currentRecord.BinLocation, currentRecord.OldLocation); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Error while moving item.",
+		})
+	}
+
+	if utils.IsNotExistingPath(currentRecord.OldLocation) {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Unknown error! Moved item is not in the right place.",
+		})
+	}
+
+	err = database.DeleteRecoveryRecord(idToInt)
+
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"err": "Error while deleting useless database record. But your item was successfully recovered.",
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"res": "Successfully recovered!",
+	})
+}
