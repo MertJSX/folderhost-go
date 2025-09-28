@@ -9,6 +9,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Known problems:
+//   - Having problems with big files. Needs size limitation.
+//     If someone tries to read a file that has 1 GB size, your PC will crash xd.
+//   - Real-time checking filesize.
+//   - We must ignore big editor-change requests from WebSocket connections.
 func ReadFile(c *fiber.Ctx) error {
 	var path string
 	var fileName string
