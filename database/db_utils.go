@@ -153,6 +153,16 @@ func DeleteRecoveryRecord(id int) error {
 	return nil
 }
 
+func ResetRecoveryRecords() error {
+	_, err := DB.Exec("DELETE FROM recovery;")
+
+	if err != nil {
+		return fmt.Errorf("error executing db stmt")
+	}
+
+	return nil
+}
+
 func GetRecoveryRecord(id int) (types.RecoveryRecord, error) {
 	var record types.RecoveryRecord
 	rows, err := DB.Query(`
