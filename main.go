@@ -81,8 +81,16 @@ func main() {
 		return routes.Recovery(c)
 	})
 
-	app.Get("/api/recover-item", func(c *fiber.Ctx) error {
+	app.Get("/api/recovery/recover", func(c *fiber.Ctx) error {
 		return routes.RecoverItem(c)
+	})
+
+	app.Get("/api/recovery/remove", func(c *fiber.Ctx) error {
+		return routes.RemoveRecoveryRecord(c)
+	})
+
+	app.Get("/api/recovery/clear", func(c *fiber.Ctx) error {
+		return routes.ResetRecoveryRecords(c)
 	})
 
 	app.Static("/", "client/dist")
