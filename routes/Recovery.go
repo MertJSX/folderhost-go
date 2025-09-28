@@ -3,7 +3,7 @@ package routes
 import (
 	"strconv"
 
-	"github.com/MertJSX/folder-host-go/database"
+	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/gofiber/fiber/v2"
 )
@@ -40,14 +40,14 @@ func Recovery(c *fiber.Ctx) error {
 
 	// My logic: If pageInt is 0, we will skip 0 records. That means that we wil get the last 10 records.
 	// If pageInt is 1 we will skip 10 records.
-	records, err := database.SearchRecoveryRecords(20, 20*pageInt)
+	records, err := recovery.SearchRecoveryRecords(20, 20*pageInt)
 	if err != nil {
 		return c.Status(500).JSON(
 			fiber.Map{"err": "Unknown error!"},
 		)
 	}
 	pageInt++
-	nextRecords, err := database.SearchRecoveryRecords(20, 20*pageInt)
+	nextRecords, err := recovery.SearchRecoveryRecords(20, 20*pageInt)
 	if err != nil {
 		return c.Status(500).JSON(
 			fiber.Map{"err": "Unknown error!"},

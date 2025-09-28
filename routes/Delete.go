@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/MertJSX/folder-host-go/database"
+	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -127,7 +127,7 @@ func Delete(c *fiber.Ctx) error {
 		SizeBytes:   sizeOfItem,
 	}
 
-	if err = database.CreateRecoveryRecord(recoveryRecord); err != nil {
+	if err = recovery.CreateRecoveryRecord(recoveryRecord); err != nil {
 		fmt.Printf("Error: %s", err)
 		return c.Status(500).JSON(fiber.Map{"err": "An error occurred during the creation of the recovery record. But the item was moved to the recovery bin."})
 	}

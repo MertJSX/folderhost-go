@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/MertJSX/folder-host-go/database"
+	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -13,7 +13,7 @@ func ResetRecoveryRecords(c *fiber.Ctx) error {
 		})
 	}
 
-	err := database.ResetRecoveryRecords()
+	err := recovery.ResetRecoveryRecords()
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

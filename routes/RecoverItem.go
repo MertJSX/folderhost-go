@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/MertJSX/folder-host-go/database"
+	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -20,7 +20,7 @@ func RecoverItem(c *fiber.Ctx) error {
 		})
 	}
 
-	currentRecord, err := database.GetRecoveryRecord(idToInt)
+	currentRecord, err := recovery.GetRecoveryRecord(idToInt)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
@@ -54,7 +54,7 @@ func RecoverItem(c *fiber.Ctx) error {
 		})
 	}
 
-	err = database.DeleteRecoveryRecord(idToInt)
+	err = recovery.DeleteRecoveryRecord(idToInt)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
