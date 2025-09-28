@@ -49,11 +49,11 @@ func main() {
 		return routes.VerifyPassword(c)
 	})
 
-	app.Get("/api/read-dir", func(c *fiber.Ctx) error {
+	app.Get("/api/explorer/read-dir", func(c *fiber.Ctx) error {
 		return routes.ReadDirectory(c)
 	})
 
-	app.Get("/api/download", func(c *fiber.Ctx) error {
+	app.Get("/api/explorer/download", func(c *fiber.Ctx) error {
 		return routes.Download(c)
 	})
 
@@ -61,19 +61,19 @@ func main() {
 		return routes.ChunkedUpload(c)
 	})
 
-	app.Get("/api/delete", func(c *fiber.Ctx) error {
+	app.Delete("/api/explorer/delete", func(c *fiber.Ctx) error {
 		return routes.Delete(c)
 	})
 
-	app.Get("/api/create-item", func(c *fiber.Ctx) error {
+	app.Post("/api/explorer/create-item", func(c *fiber.Ctx) error {
 		return routes.CreateItem(c)
 	})
 
-	app.Get("/api/create-copy", func(c *fiber.Ctx) error {
+	app.Post("/api/explorer/create-copy", func(c *fiber.Ctx) error {
 		return routes.CreateCopy(c)
 	})
 
-	app.Get("/api/rename", func(c *fiber.Ctx) error {
+	app.Put("/api/explorer/rename", func(c *fiber.Ctx) error {
 		return routes.Rename(c)
 	})
 
@@ -81,15 +81,15 @@ func main() {
 		return routes.Recovery(c)
 	})
 
-	app.Get("/api/recovery/recover", func(c *fiber.Ctx) error {
+	app.Put("/api/recovery/recover", func(c *fiber.Ctx) error {
 		return routes.RecoverItem(c)
 	})
 
-	app.Get("/api/recovery/remove", func(c *fiber.Ctx) error {
+	app.Delete("/api/recovery/remove", func(c *fiber.Ctx) error {
 		return routes.RemoveRecoveryRecord(c)
 	})
 
-	app.Get("/api/recovery/clear", func(c *fiber.Ctx) error {
+	app.Delete("/api/recovery/clear", func(c *fiber.Ctx) error {
 		return routes.ResetRecoveryRecords(c)
 	})
 
