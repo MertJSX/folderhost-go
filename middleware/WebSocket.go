@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/contrib/websocket"
@@ -36,25 +37,19 @@ func WsConnect(c *fiber.Ctx) error {
 
 	username, err := utils.VerifyToken(token, utils.Config.SecretJwtKey)
 	if err != nil {
-		return c.Status(401).JSON(fiber.Map{"error": "Invalid token"})
+		return c.Status(401).JSON(fiber.Map{"error": "invalid token"})
 	}
 
-	config := &utils.Config
-	var accountFound bool
-	for _, v := range config.Accounts {
-		if v.Name == username {
-			c.Locals("username", username)
-			c.Locals("account", v)
-			c.Locals("token", token)
-			c.Locals("allowed", true)
-			accountFound = true
-			break
-		}
+	foundAccount, err := users.GetUserByUsername(username)
+
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"err": "account not found"})
 	}
 
-	if !accountFound {
-		return c.Status(401).JSON(fiber.Map{"error": "Account not found"})
-	}
+	c.Locals("username", foundAccount.Username)
+	c.Locals("account", foundAccount)
+	c.Locals("token", token)
+	c.Locals("allowed", true)
 
 	return c.Next()
 }
@@ -134,7 +129,7 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 		utils.SendToAllExclude(filePath, mt, msg, c)
 		return applyEditorChange(filePath, message.Change)
 	case "unzip":
-		if !account.Permissions.Unzip {
+		if !account.Permissions.Extract {
 			permissionError, _ := json.Marshal(fiber.Map{
 				"type":  "error",
 				"error": "You don't have permission to unzip!",

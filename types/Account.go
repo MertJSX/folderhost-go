@@ -1,7 +1,8 @@
 package types
 
 type Account struct {
-	Name        string             `yaml:"name"`
+	Username    string             `yaml:"username"`
+	Email       string             `yaml:"email"`
 	Password    string             `yaml:"password"`
 	Permissions AccountPermissions `yaml:"permissions"`
 }
@@ -16,7 +17,7 @@ type AccountPermissions struct {
 	DownloadFiles   bool `yaml:"download" json:"download"`
 	UploadFiles     bool `yaml:"upload" json:"upload"`
 	Rename          bool `yaml:"rename" json:"rename"`
-	Unzip           bool `yaml:"unzip" json:"unzip"`
+	Extract         bool `yaml:"extract" json:"unzip"`
 	Copy            bool `yaml:"copy" json:"copy"`
 	ReadRecovery    bool `yaml:"read_recovery" json:"read_recovery"`
 	UseRecovery     bool `yaml:"use_recovery" json:"use_recovery"`

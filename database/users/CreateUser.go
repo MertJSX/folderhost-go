@@ -8,13 +8,17 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 )
 
-func CreateUser(user types.Account) error {
+func CreateUser(user *types.Account) error {
+	if exists, _ := CheckIfUsernameExists(user.Username); exists {
+		return fmt.Errorf("username already exists")
+	}
+
 	tx, err := database.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
 		return fmt.Errorf("Begin transaction error: %w", err)
 	}
-	if exists, _ := CheckIfUsernameExists(user.Name); exists {
+	if exists, _ := CheckIfUsernameExists(user.Username); exists {
 		return fmt.Errorf("username already exists")
 	}
 	stmt, err := tx.Prepare(`
@@ -31,11 +35,12 @@ func CreateUser(user types.Account) error {
 			download_permission,
 			upload_permission,
 			rename_permission,
-			archive_permission,
+			extract_permission,
 			copy_permission,
 			logs_permission,
-			recovery_permission
-		) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			read_recovery_permission,
+			use_recovery_permission
+		) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 
 	if err != nil {
@@ -45,9 +50,9 @@ func CreateUser(user types.Account) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
-		user.Name,
+		user.Username,
 		user.Password,
-		"",
+		user.Email,
 		user.Permissions.ReadDirectories,
 		user.Permissions.ReadFiles,
 		user.Permissions.Create,
@@ -56,13 +61,20 @@ func CreateUser(user types.Account) error {
 		user.Permissions.Move,
 		user.Permissions.DownloadFiles,
 		user.Permissions.UploadFiles,
+		user.Permissions.Rename,
+		user.Permissions.Extract,
 		user.Permissions.Copy,
 		false,
-		false,
+		user.Permissions.ReadRecovery,
+		user.Permissions.UseRecovery,
 	)
 
 	if err != nil {
 		return fmt.Errorf("error executing db stmt")
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("commit error: %w", err)
 	}
 
 	return nil

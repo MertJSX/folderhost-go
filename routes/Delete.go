@@ -119,7 +119,7 @@ func Delete(c *fiber.Ctx) error {
 	}
 
 	var recoveryRecord types.RecoveryRecord = types.RecoveryRecord{
-		Username:    c.Locals("account").(types.Account).Name,
+		Username:    c.Locals("account").(types.Account).Username,
 		OldLocation: path,
 		BinLocation: fmt.Sprintf("./recovery_bin/%s", fullFileName),
 		IsDirectory: isDirectory,

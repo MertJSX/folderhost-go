@@ -8,7 +8,8 @@ import (
 func CreateUsersTable() {
 	_, err := DB.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
-			username TEXT NOT NULL PRIMARY KEY,
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			username TEXT NOT NULL UNIQUE,
 			password TEXT NULL,
 			email TEXT NULL,
 			read_directories BOOLEAN DEFAULT FALSE,
@@ -20,10 +21,9 @@ func CreateUsersTable() {
         	download_permission BOOLEAN DEFAULT FALSE,
         	upload_permission BOOLEAN DEFAULT FALSE,
         	rename_permission BOOLEAN DEFAULT FALSE,
-        	archive_permission BOOLEAN DEFAULT FALSE,
+        	extract_permission BOOLEAN DEFAULT FALSE,
         	copy_permission BOOLEAN DEFAULT FALSE,
 			logs_permission BOOLEAN DEFAULT FALSE,
-			recovery_permission BOOLEAN DEFAULT FALSE,
 			read_recovery_permission BOOLEAN DEFAULT FALSE,
 			use_recovery_permission BOOLEAN DEFAULT FALSE,
         	created_at DATETIME DEFAULT CURRENT_TIMESTAMP

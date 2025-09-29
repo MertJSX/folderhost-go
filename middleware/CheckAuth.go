@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -67,18 +68,17 @@ func CheckAuth(c *fiber.Ctx) error {
 		controlPassword = true
 	}
 
-	config := &utils.Config
-	for _, v := range config.Accounts {
-		if v.Name != username {
-			continue
-		}
-		if controlPassword && password != v.Password {
-			return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
-		}
+	foundAccount, err := users.GetUserByUsername(username)
 
-		c.Locals("account", v)
-		return c.Next()
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"err": "account not found"})
 	}
 
-	return c.Status(404).JSON(fiber.Map{"err": "account not found"})
+	if controlPassword && password != foundAccount.Password {
+		return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
+	}
+
+	c.Locals("account", foundAccount)
+	return c.Next()
+
 }
