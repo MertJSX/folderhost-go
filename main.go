@@ -93,6 +93,10 @@ func main() {
 		return routes.ResetRecoveryRecords(c)
 	})
 
+	app.Get("/api/users", func(c *fiber.Ctx) error {
+		return routes.GetAllUsers(c)
+	})
+
 	app.Static("/", "client/dist")
 
 	app.Get("*", func(c *fiber.Ctx) error {
