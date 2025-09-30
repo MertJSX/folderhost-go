@@ -25,7 +25,10 @@ func GetUserByUsername(username string) (types.Account, error) {
 			extract_permission,
 			copy_permission,
 			read_recovery_permission,
-			use_recovery_permission
+			use_recovery_permission,
+			read_users_permission,
+			edit_users_permission,
+			logs_permission
 		FROM users
 		WHERE username = ?
 	`
@@ -51,6 +54,9 @@ func GetUserByUsername(username string) (types.Account, error) {
 		&u.Permissions.Copy,
 		&u.Permissions.ReadRecovery,
 		&u.Permissions.UseRecovery,
+		&u.Permissions.ReadUsers,
+		&u.Permissions.EditUsers,
+		&u.Permissions.ReadLogs,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {

@@ -23,7 +23,10 @@ func UpdateAdmin(user *types.Account) error {
 			extract_permission = ?,
 			copy_permission = ?,
 			read_recovery_permission = ?,
-			use_recovery_permission = ?
+			use_recovery_permission = ?,
+			read_users_permission = ?,
+			edit_users_permission = ?,
+			logs_permission = ?
 		WHERE id = 1
 	`
 
@@ -45,6 +48,9 @@ func UpdateAdmin(user *types.Account) error {
 		user.Permissions.Copy,
 		user.Permissions.ReadRecovery,
 		user.Permissions.UseRecovery,
+		user.Permissions.ReadUsers,
+		user.Permissions.EditUsers,
+		user.Permissions.ReadLogs,
 	)
 
 	return err

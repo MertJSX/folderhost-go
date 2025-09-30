@@ -39,8 +39,10 @@ func CreateUser(user *types.Account) error {
 			copy_permission,
 			logs_permission,
 			read_recovery_permission,
-			use_recovery_permission
-		) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			use_recovery_permission,
+			read_users_permission,
+			edit_users_permission
+		) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 
 	if err != nil {
@@ -64,9 +66,11 @@ func CreateUser(user *types.Account) error {
 		user.Permissions.Rename,
 		user.Permissions.Extract,
 		user.Permissions.Copy,
-		false,
+		user.Permissions.ReadLogs,
 		user.Permissions.ReadRecovery,
 		user.Permissions.UseRecovery,
+		user.Permissions.ReadUsers,
+		user.Permissions.EditUsers,
 	)
 
 	if err != nil {
