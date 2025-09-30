@@ -33,6 +33,9 @@ admin:
     copy: true
     read_recovery: true
     use_recovery: true
+    read_users: true
+    edit_users: true
+    read_logs: true
 
 # Holds deleted files. Accidentally, you might delete files that you don't want to delete.
 recovery_bin: false
