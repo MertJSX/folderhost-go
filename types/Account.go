@@ -14,8 +14,8 @@ type AccountPermissions struct {
 	Change          bool `yaml:"change" json:"change"`
 	Delete          bool `yaml:"delete" json:"delete"`
 	Move            bool `yaml:"move" json:"move"`
-	DownloadFiles   bool `yaml:"download" json:"download"`
-	UploadFiles     bool `yaml:"upload" json:"upload"`
+	DownloadFiles   bool `yaml:"download" json:"download_files"`
+	UploadFiles     bool `yaml:"upload" json:"upload_files"`
 	Rename          bool `yaml:"rename" json:"rename"`
 	Extract         bool `yaml:"extract" json:"extract"`
 	Copy            bool `yaml:"copy" json:"copy"`

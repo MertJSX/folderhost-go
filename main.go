@@ -97,6 +97,10 @@ func main() {
 		return routes.GetAllUsers(c)
 	})
 
+	app.Post("/api/users/new", func(c *fiber.Ctx) error {
+		return routes.CreateUser(c)
+	})
+
 	app.Static("/", "client/dist")
 
 	app.Get("*", func(c *fiber.Ctx) error {
