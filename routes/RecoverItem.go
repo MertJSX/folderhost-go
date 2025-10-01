@@ -5,12 +5,18 @@ import (
 	"strconv"
 
 	"github.com/MertJSX/folder-host-go/database/recovery"
+	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
 // Missing: Check for space requirements
 func RecoverItem(c *fiber.Ctx) error {
+	if !c.Locals("account").(types.Account).Permissions.UseRecovery {
+		return c.JSON(
+			fiber.Map{"err": "No permission!"},
+		)
+	}
 	var id string = c.Query("id")
 	idToInt, err := strconv.Atoi(id)
 

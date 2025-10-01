@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -59,6 +60,11 @@ func Upload(c *fiber.Ctx) error {
 }
 
 func ChunkedUpload(c *fiber.Ctx) error {
+	if !c.Locals("account").(types.Account).Permissions.UploadFiles {
+		return c.JSON(
+			fiber.Map{"err": "No permission!"},
+		)
+	}
 	config := &utils.Config
 	targetPath := c.Query("path")
 	if targetPath == "" {
