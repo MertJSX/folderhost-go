@@ -14,7 +14,7 @@ import (
 func Delete(c *fiber.Ctx) error {
 
 	if !c.Locals("account").(types.Account).Permissions.Delete {
-		return c.JSON(
+		return c.Status(403).JSON(
 			fiber.Map{"err": "No permission!"},
 		)
 	}

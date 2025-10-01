@@ -9,7 +9,7 @@ import (
 
 func ResetRecoveryRecords(c *fiber.Ctx) error {
 	if !c.Locals("account").(types.Account).Permissions.UseRecovery {
-		return c.JSON(
+		return c.Status(403).JSON(
 			fiber.Map{"err": "No permission!"},
 		)
 	}

@@ -61,7 +61,7 @@ func Upload(c *fiber.Ctx) error {
 
 func ChunkedUpload(c *fiber.Ctx) error {
 	if !c.Locals("account").(types.Account).Permissions.UploadFiles {
-		return c.JSON(
+		return c.Status(403).JSON(
 			fiber.Map{"err": "No permission!"},
 		)
 	}

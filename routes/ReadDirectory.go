@@ -17,7 +17,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 	start := time.Now()
 
 	if !c.Locals("account").(types.Account).Permissions.ReadDirectories {
-		return c.JSON(
+		return c.Status(403).JSON(
 			fiber.Map{"err": "No permission!"},
 		)
 	}
