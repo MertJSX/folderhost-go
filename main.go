@@ -97,8 +97,20 @@ func main() {
 		return routes.GetAllUsers(c)
 	})
 
+	app.Get("/api/users/:username", func(c *fiber.Ctx) error {
+		return routes.GetUser(c)
+	})
+
+	app.Put("/api/users/edit", func(c *fiber.Ctx) error {
+		return routes.EditUser(c)
+	})
+
 	app.Post("/api/users/new", func(c *fiber.Ctx) error {
 		return routes.CreateUser(c)
+	})
+
+	app.Delete("/api/users/remove/:id", func(c *fiber.Ctx) error {
+		return routes.RemoveUser(c)
 	})
 
 	app.Static("/", "client/dist")

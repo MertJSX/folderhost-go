@@ -1,6 +1,7 @@
 package types
 
 type Account struct {
+	ID          *int               `yaml:"id,omitempty" json:"id,omitempty"`
 	Username    string             `yaml:"username" json:"username"`
 	Email       string             `yaml:"email" json:"email"`
 	Password    string             `yaml:"password" json:"password"`

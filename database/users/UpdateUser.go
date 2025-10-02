@@ -5,9 +5,10 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 )
 
-func UpdateUser(user *types.Account) error {
+func UpdateUser(id int, user *types.Account) error {
 	const query = `
 		UPDATE users SET
+			username = ?,
 			password = ?,
 			email = ?,
 			read_directories = ?,
@@ -26,11 +27,12 @@ func UpdateUser(user *types.Account) error {
 			read_users_permission = ?,
 			edit_users_permission = ?,
 			logs_permission = ?
-		WHERE username = ?
+		WHERE id = ?;
 	`
 
 	_, err := database.DB.Exec(
 		query,
+		user.Username,
 		user.Password,
 		user.Email,
 		user.Permissions.ReadDirectories,
@@ -49,7 +51,7 @@ func UpdateUser(user *types.Account) error {
 		user.Permissions.ReadUsers,
 		user.Permissions.EditUsers,
 		user.Permissions.ReadLogs,
-		user.Username,
+		id,
 	)
 
 	return err

@@ -10,6 +10,7 @@ import (
 func GetUserByUsername(username string) (types.Account, error) {
 	const query = `
 		SELECT
+			id,
 			username,
 			password,
 			email,
@@ -38,6 +39,7 @@ func GetUserByUsername(username string) (types.Account, error) {
 	u := types.Account{}
 
 	err := row.Scan(
+		&u.ID,
 		&u.Username,
 		&u.Password,
 		&u.Email,
