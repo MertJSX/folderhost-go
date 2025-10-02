@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/gofiber/fiber/v2"
@@ -25,11 +23,25 @@ func CreateUser(c *fiber.Ctx) error {
 		)
 	}
 
-	fmt.Printf("Username: %s\n", requestBody.User.Username)
-	fmt.Printf("Email: %s\n", requestBody.User.Email)
-	fmt.Printf("Password: %s\n", requestBody.User.Password)
+	if requestBody.User.Username == "" {
+		return c.Status(400).JSON(
+			fiber.Map{"err": "Username is missing."},
+		)
+	}
+
+	if requestBody.User.Password == "" {
+		return c.Status(400).JSON(
+			fiber.Map{"err": "Password is missing."},
+		)
+	}
 
 	err := users.CreateUser(&requestBody.User)
+
+	if err.Error() == "username already exists" {
+		return c.Status(400).JSON(
+			fiber.Map{"err": "Username already exists."},
+		)
+	}
 
 	if err != nil {
 		return c.Status(500).JSON(
