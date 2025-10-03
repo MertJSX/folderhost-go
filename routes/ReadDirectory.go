@@ -95,6 +95,8 @@ func ReadDirectory(c *fiber.Ctx) error {
 		directoryInfo.Size = utils.ConvertBytesToString(mainDirectorySize)
 	}
 
+	directoryInfo.Id = -1
+
 	fmt.Printf("%s, execution time %s\n", "Read directory", time.Since(start))
 	return c.JSON(
 		fiber.Map{
