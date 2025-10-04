@@ -46,8 +46,15 @@ func CreateLogsTable() {
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username TEXT NOT NULL,
 			action TEXT NULL,
-        	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+			description TEXT NULL,
+        	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (username) REFERENCES users(username) 
+                ON DELETE CASCADE 
+                ON UPDATE CASCADE
 		);
+
+		CREATE INDEX IF NOT EXISTS idx_logs_username ON logs(username);
+		CREATE INDEX IF NOT EXISTS idx_logs_created_at ON logs(created_at);
 	`)
 
 	if err != nil {
@@ -68,7 +75,10 @@ func CreateRecoveryTable() {
 			isDirectory INTEGER NOT NULL DEFAULT 0,
 			sizeDisplay TEXT NULL,
 			sizeBytes INTEGER NOT NULL DEFAULT 0,
-        	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (username) REFERENCES users(username) 
+                ON DELETE CASCADE 
+                ON UPDATE CASCADE
 		);
 	`)
 

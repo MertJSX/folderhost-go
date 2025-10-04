@@ -27,6 +27,11 @@ func InitializeDatabase() {
 		log.Fatal(err)
 	}
 
+	_, err = database.DB.Exec("PRAGMA foreign_keys = ON;")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if firstTime {
 		database.CreateUsersTable()
 		database.CreateLogsTable()
