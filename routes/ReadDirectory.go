@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
-	"time"
 
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -14,8 +13,6 @@ import (
 )
 
 func ReadDirectory(c *fiber.Ctx) error {
-	start := time.Now()
-
 	if !c.Locals("account").(types.Account).Permissions.ReadDirectories {
 		return c.Status(403).JSON(
 			fiber.Map{"err": "No permission!"},
@@ -23,7 +20,6 @@ func ReadDirectory(c *fiber.Ctx) error {
 	}
 
 	path := c.Query("folder")
-	fmt.Println(path)
 	mode := func() string {
 		switch c.Query("mode") {
 		case "Optimized mode":
@@ -97,7 +93,6 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	directoryInfo.Id = -1
 
-	fmt.Printf("%s, execution time %s\n", "Read directory", time.Since(start))
 	return c.JSON(
 		fiber.Map{
 			"data":          data,
