@@ -41,9 +41,6 @@ func ReadFile(c *fiber.Ctx) error {
 	fileName = itemStat.Name()
 	lastModified = itemStat.ModTime().GoString()
 
-	fmt.Printf("Filename: %s\n", fileName)
-	fmt.Printf("Last modified: %s\n", lastModified)
-
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Unknown server error!"})
 	}
