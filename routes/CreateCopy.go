@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -79,6 +80,12 @@ func CreateCopy(c *fiber.Ctx) error {
 		if err := utils.CopyDirectory(config.Folder+path, config.Folder+copyPath); err != nil {
 			return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Create copy",
+			Description: fmt.Sprintf("%s created a copy of %s", c.Locals("account").(types.Account).Username, path),
+		})
 	}
 
 	return c.Status(200).JSON(fiber.Map{"err": "Copied!"})

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -39,6 +40,13 @@ func Delete(c *fiber.Ctx) error {
 
 	if pathStat.IsDir() && !config.RecoveryBin {
 		err := os.RemoveAll(path)
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Delete",
+			Description: fmt.Sprintf("%s permanently deleted a %s directory.", c.Locals("account").(types.Account).Username, path),
+		})
+
 		if err == nil {
 			return c.Status(200).JSON(fiber.Map{"response": "Item was deleted successfully!"})
 		}
@@ -46,6 +54,13 @@ func Delete(c *fiber.Ctx) error {
 
 	if !config.RecoveryBin {
 		err := os.Remove(path)
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Delete",
+			Description: fmt.Sprintf("%s permanently deleted a %s file.", c.Locals("account").(types.Account).Username, path),
+		})
+
 		if err == nil {
 			return c.Status(200).JSON(fiber.Map{"response": "Item was deleted successfully!"})
 		} else {
@@ -131,6 +146,12 @@ func Delete(c *fiber.Ctx) error {
 		fmt.Printf("Error: %s", err)
 		return c.Status(500).JSON(fiber.Map{"err": "An error occurred during the creation of the recovery record. But the item was moved to the recovery bin."})
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Delete",
+		Description: fmt.Sprintf("%s moved %s to recovery_bin", c.Locals("account").(types.Account).Username, path),
+	})
 
 	return c.Status(200).JSON(fiber.Map{"response": "Item was deleted successfully!"})
 }

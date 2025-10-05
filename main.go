@@ -113,6 +113,10 @@ func main() {
 		return routes.RemoveUser(c)
 	})
 
+	app.Get("/api/logs", func(c *fiber.Ctx) error {
+		return routes.Logs(c)
+	})
+
 	app.Static("/", "client/dist")
 
 	app.Get("*", func(c *fiber.Ctx) error {

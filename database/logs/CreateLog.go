@@ -19,8 +19,8 @@ func CreateLog(logItem types.AuditLog) error {
 		INSERT INTO logs(
 			username,
 			action,
-			description,
-		) VALUES(?, ?, ?, ?, ?, ?)
+			description
+		) VALUES(?, ?, ?)
 	`)
 
 	if err != nil {

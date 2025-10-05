@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -46,6 +47,13 @@ func CreateItem(c *fiber.Ctx) error {
 				fiber.Map{"err": "Internal server error!"},
 			)
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Create folder",
+			Description: fmt.Sprintf("%s created a %s%s folder.", c.Locals("account").(types.Account).Username, itemPath, itemName),
+		})
+
 		return c.Status(200).JSON(
 			fiber.Map{"err": "The folder was created successfully!"},
 		)
@@ -56,6 +64,13 @@ func CreateItem(c *fiber.Ctx) error {
 				fiber.Map{"err": "Internal server error!"},
 			)
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Create file",
+			Description: fmt.Sprintf("%s created a %s%s file", c.Locals("account").(types.Account).Username, itemPath, itemName),
+		})
+
 		return c.Status(200).JSON(
 			fiber.Map{"err": "The file was created successfully!"},
 		)

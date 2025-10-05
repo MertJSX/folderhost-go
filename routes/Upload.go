@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -136,6 +137,13 @@ func ChunkedUpload(c *fiber.Ctx) error {
 				"err": "Error uploading file",
 			})
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Upload",
+			Description: fmt.Sprintf("%s uploaded a %s%s file.", c.Locals("account").(types.Account).Username, finalPath, fileName),
+		})
+
 		return c.JSON(fiber.Map{
 			"response": "Successfully uploaded!",
 			"uploaded": true,

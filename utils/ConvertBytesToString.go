@@ -10,7 +10,7 @@ func ConvertBytesToString(bytes int64) string {
 	var bytesFloat float64 = float64(bytes)
 
 	if bytes == 0 {
-		return "N/A"
+		return "0 Bytes"
 	}
 
 	var i int = int(math.Floor(math.Log(bytesFloat) / math.Log(1024)))

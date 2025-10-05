@@ -7,20 +7,44 @@ import (
 )
 
 var (
-	clients   = make(map[*websocket.Conn]string) // conn -> path
-	clientsMu sync.RWMutex
+	clients       = make(map[*websocket.Conn]string) // conn -> path
+	clientsMu     sync.RWMutex
+	connMutexes   = make(map[*websocket.Conn]*sync.Mutex)
+	connMutexesMu sync.RWMutex
 )
 
 func AddClient(conn *websocket.Conn, path string) {
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
 	clients[conn] = path
+
+	connMutexesMu.Lock()
+	defer connMutexesMu.Unlock()
+	connMutexes[conn] = &sync.Mutex{}
 }
 
 func RemoveClient(conn *websocket.Conn) {
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
 	delete(clients, conn)
+
+	connMutexesMu.Lock()
+	defer connMutexesMu.Unlock()
+	delete(connMutexes, conn)
+}
+
+func safeWriteMessage(conn *websocket.Conn, mt int, message []byte) error {
+	connMutexesMu.RLock()
+	mutex, exists := connMutexes[conn]
+	connMutexesMu.RUnlock()
+
+	if !exists {
+		return nil
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+	return conn.WriteMessage(mt, message)
 }
 
 func SendToAllExclude(path string, mt int, message []byte, exclude *websocket.Conn) {
@@ -29,7 +53,7 @@ func SendToAllExclude(path string, mt int, message []byte, exclude *websocket.Co
 
 	for conn, clientPath := range clients {
 		if clientPath == path && conn != exclude {
-			conn.WriteMessage(mt, message)
+			go safeWriteMessage(conn, mt, message)
 		}
 	}
 }
@@ -40,7 +64,7 @@ func SendToAll(path string, mt int, message []byte) {
 
 	for conn, clientPath := range clients {
 		if clientPath == path {
-			conn.WriteMessage(mt, message)
+			go safeWriteMessage(conn, mt, message)
 		}
 	}
 }
@@ -54,6 +78,5 @@ func GetClientsCount(path string) int {
 			count++
 		}
 	}
-
 	return count
 }

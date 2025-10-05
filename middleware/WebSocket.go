@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -75,6 +76,8 @@ func HandleWebsocket(c *websocket.Conn) {
 
 	var username string = c.Locals("username").(string)
 
+	defer utils.TriggerPendingLog(username, path)
+
 	// websocket.Conn bindings https://pkg.go.dev/github.com/fasthttp/websocket?tab=doc#pkg-index
 	var (
 		mt  int
@@ -126,6 +129,9 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 			c.WriteMessage(mt, permissionError)
 			return nil // Server doesn't care about permission errors
 		}
+
+		utils.ScheduleDebouncedLog(account.Username, filePath)
+
 		utils.SendToAllExclude(filePath, mt, msg, c)
 		return applyEditorChange(filePath, message.Change)
 	case "unzip":
@@ -138,6 +144,13 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 			c.WriteMessage(mt, permissionError)
 			return nil // Server doesn't care about permission errors
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    account.Username,
+			Action:      "Extract file",
+			Description: fmt.Sprintf("%s started unzipping %s file.", account.Username, message.Path),
+		})
+
 		handleUnzip(c, mt, message)
 	default:
 		log.Printf("Unknown message type: %s\n", message.Type)

@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/gofiber/fiber/v2"
@@ -58,6 +59,12 @@ func EditUser(c *fiber.Ctx) error {
 			fiber.Map{"err": "Unknown server error."},
 		)
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Edit user",
+		Description: fmt.Sprintf("%s modified user %s.", c.Locals("account").(types.Account).Username, requestBody.User.Username),
+	})
 
 	return c.Status(200).JSON(
 		fiber.Map{"response": "User successfully created!"},

@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"fmt"
+
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -12,6 +15,12 @@ func VerifyPassword(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "unknown error while getting token"})
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Login",
+		Description: fmt.Sprintf("%s logged in to his account.", c.Locals("account").(types.Account).Username),
+	})
 
 	return c.JSON(
 		fiber.Map{

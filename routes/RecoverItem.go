@@ -1,9 +1,11 @@
 package routes
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -67,6 +69,12 @@ func RecoverItem(c *fiber.Ctx) error {
 			"err": "Error while deleting useless database record. But your item was successfully recovered.",
 		})
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Recover record",
+		Description: fmt.Sprintf("%s recovered %s.", c.Locals("account").(types.Account).Username, currentRecord.OldLocation),
+	})
 
 	return c.Status(200).JSON(fiber.Map{
 		"res": "Successfully recovered!",

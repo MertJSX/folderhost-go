@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"fmt"
+
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -27,6 +30,12 @@ func ResetRecoveryRecords(c *fiber.Ctx) error {
 			"err": "Error while deleting database records. But your items were successfully removed.",
 		})
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Clear Recovery",
+		Description: fmt.Sprintf("%s cleared all the recovery records", c.Locals("account").(types.Account).Username),
+	})
 
 	return c.Status(200).JSON(fiber.Map{
 		"res": "Successfully cleared!",

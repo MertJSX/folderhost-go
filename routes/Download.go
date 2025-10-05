@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -33,6 +34,12 @@ func Download(c *fiber.Ctx) error {
 			fiber.Map{"err": "You can't download a directory!"},
 		)
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Download",
+		Description: fmt.Sprintf("%s downloaded a %s file.", c.Locals("account").(types.Account).Username, path),
+	})
 
 	return c.Status(200).Download(filepath)
 }

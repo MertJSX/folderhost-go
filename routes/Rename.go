@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/fiber/v2"
@@ -71,6 +72,12 @@ func Rename(c *fiber.Ctx) error {
 		if err != nil {
 			return c.Status(520).JSON(fiber.Map{"err": "Unknown error while moving item"})
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Move",
+			Description: fmt.Sprintf("%s moved an item %s -> %s", c.Locals("account").(types.Account).Username, oldFilepath, newFilepath+"/"+filename),
+		})
 	} else {
 		oldPathPlaceholder := fmt.Sprintf("%s/%s", config.Folder, filename)
 		newPathPlaceholder := fmt.Sprintf("%s%s", config.Folder, newFilepath)
@@ -84,6 +91,12 @@ func Rename(c *fiber.Ctx) error {
 			fmt.Printf("Error while renaming item: %s", err)
 			return c.Status(520).JSON(fiber.Map{"err": "Unknown error while renaming item"})
 		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Rename",
+			Description: fmt.Sprintf("%s renamed an item %s -> %s", c.Locals("account").(types.Account).Username, filename, newFilepath),
+		})
 	}
 
 	return c.Status(200).JSON(fiber.Map{"response": "Saved!"})
