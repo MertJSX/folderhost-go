@@ -1,4 +1,4 @@
-package types
+package cache
 
 import (
 	"sync"
@@ -7,7 +7,7 @@ import (
 
 type Cache[KeyType int | string, DataType any] struct {
 	Items  map[KeyType]CacheItem[DataType]
-	Mutex  sync.Mutex
+	Mutex  sync.RWMutex
 	Ticker *time.Ticker
 }
 
