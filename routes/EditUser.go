@@ -6,6 +6,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -26,8 +27,6 @@ func EditUser(c *fiber.Ctx) error {
 		)
 	}
 
-	fmt.Println(requestBody.User.ID)
-
 	if requestBody.User.ID == nil {
 		return c.Status(400).JSON(fiber.Map{
 			"err": "Bad request. User's ID is missing!",
@@ -40,9 +39,11 @@ func EditUser(c *fiber.Ctx) error {
 		})
 	}
 
-	if requestBody.User.Username == "" {
+	username, err := users.GetUsername(*requestBody.User.ID)
+
+	if requestBody.User.Username == "" || err != nil {
 		return c.Status(400).JSON(
-			fiber.Map{"err": "Username is missing."},
+			fiber.Map{"err": "Username is missing or not existing in db."},
 		)
 	}
 
@@ -52,12 +53,16 @@ func EditUser(c *fiber.Ctx) error {
 		)
 	}
 
-	err := users.UpdateUser(*requestBody.User.ID, &requestBody.User)
+	err = users.UpdateUser(*requestBody.User.ID, &requestBody.User)
 
 	if err != nil {
 		return c.Status(500).JSON(
 			fiber.Map{"err": "Unknown server error."},
 		)
+	}
+
+	if _, ok := cache.SessionCache.Get(username); ok {
+		cache.SessionCache.Delete(requestBody.User.Username)
 	}
 
 	logs.CreateLog(types.AuditLog{

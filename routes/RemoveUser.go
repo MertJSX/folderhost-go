@@ -5,6 +5,7 @@ import (
 
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -28,6 +29,14 @@ func RemoveUser(c *fiber.Ctx) error {
 			"err": "You can't remove the admin account!",
 		})
 	}
+
+	username, err := users.GetUsername(idToInt)
+
+	if err != nil {
+		cache.SessionCache.Clear()
+	}
+
+	cache.SessionCache.Delete(username)
 
 	err = users.RemoveUser(idToInt)
 

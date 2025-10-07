@@ -1,8 +1,11 @@
 package middleware
 
 import (
+	"time"
+
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -68,6 +71,15 @@ func CheckAuth(c *fiber.Ctx) error {
 		controlPassword = true
 	}
 
+	if cacheAccount, ok := cache.SessionCache.Get(username); ok {
+		if controlPassword && password != cacheAccount.Password {
+			return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
+		}
+
+		c.Locals("account", cacheAccount)
+		return c.Next()
+	}
+
 	foundAccount, err := users.GetUserByUsername(username)
 
 	if err != nil {
@@ -78,7 +90,7 @@ func CheckAuth(c *fiber.Ctx) error {
 		return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
 	}
 
+	cache.SessionCache.Set(username, foundAccount, 30*time.Minute)
 	c.Locals("account", foundAccount)
 	return c.Next()
-
 }

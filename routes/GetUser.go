@@ -1,10 +1,9 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,11 +16,15 @@ func GetUser(c *fiber.Ctx) error {
 
 	var username string = c.Params("username")
 
-	fmt.Println(username)
-
 	if username == "" {
 		return c.Status(400).JSON(
 			fiber.Map{"err": "Username is missing!"},
+		)
+	}
+
+	if cacheUser, ok := cache.SessionCache.Get(username); ok {
+		return c.Status(200).JSON(
+			fiber.Map{"user": cacheUser},
 		)
 	}
 
