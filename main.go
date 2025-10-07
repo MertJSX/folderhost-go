@@ -49,6 +49,10 @@ func main() {
 		return routes.VerifyPassword(c)
 	})
 
+	app.Get("/api/permissions", func(c *fiber.Ctx) error {
+		return routes.GetPermissions(c)
+	})
+
 	app.Get("/api/explorer/read-dir", func(c *fiber.Ctx) error {
 		return routes.ReadDirectory(c)
 	})
