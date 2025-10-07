@@ -58,7 +58,7 @@ func Delete(c *fiber.Ctx) error {
 		logs.CreateLog(types.AuditLog{
 			Username:    c.Locals("account").(types.Account).Username,
 			Action:      "Delete",
-			Description: fmt.Sprintf("%s permanently deleted a %s file.", c.Locals("account").(types.Account).Username, path),
+			Description: fmt.Sprintf("%s permanently deleted a %s file", c.Locals("account").(types.Account).Username, path),
 		})
 
 		if err == nil {

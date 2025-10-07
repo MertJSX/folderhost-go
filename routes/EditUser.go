@@ -62,13 +62,13 @@ func EditUser(c *fiber.Ctx) error {
 	}
 
 	if _, ok := cache.SessionCache.Get(username); ok {
-		cache.SessionCache.Delete(requestBody.User.Username)
+		cache.SessionCache.Delete(username)
 	}
 
 	logs.CreateLog(types.AuditLog{
 		Username:    c.Locals("account").(types.Account).Username,
 		Action:      "Edit user",
-		Description: fmt.Sprintf("%s modified user %s.", c.Locals("account").(types.Account).Username, requestBody.User.Username),
+		Description: fmt.Sprintf("%s modified user %s", c.Locals("account").(types.Account).Username, requestBody.User.Username),
 	})
 
 	return c.Status(200).JSON(

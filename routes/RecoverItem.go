@@ -73,7 +73,7 @@ func RecoverItem(c *fiber.Ctx) error {
 	logs.CreateLog(types.AuditLog{
 		Username:    c.Locals("account").(types.Account).Username,
 		Action:      "Recover record",
-		Description: fmt.Sprintf("%s recovered %s.", c.Locals("account").(types.Account).Username, currentRecord.OldLocation),
+		Description: fmt.Sprintf("%s recovered %s", c.Locals("account").(types.Account).Username, currentRecord.OldLocation),
 	})
 
 	return c.Status(200).JSON(fiber.Map{

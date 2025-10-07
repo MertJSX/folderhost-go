@@ -1,8 +1,10 @@
 package routes
 
 import (
+	"fmt"
 	"strconv"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils/cache"
@@ -45,6 +47,12 @@ func RemoveUser(c *fiber.Ctx) error {
 			"err": "Internal server error",
 		})
 	}
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Remove User",
+		Description: fmt.Sprintf("%s permanently removed %s user", c.Locals("account").(types.Account).Username, username),
+	})
 
 	return c.Status(200).JSON(fiber.Map{
 		"res": "Successfully removed!",

@@ -60,7 +60,7 @@ func RemoveRecoveryRecord(c *fiber.Ctx) error {
 	logs.CreateLog(types.AuditLog{
 		Username:    c.Locals("account").(types.Account).Username,
 		Action:      "Remove Recovery record",
-		Description: fmt.Sprintf("%s permanently removed %s recovery record.", c.Locals("account").(types.Account).Username, currentRecord.OldLocation),
+		Description: fmt.Sprintf("%s permanently removed %s recovery record", c.Locals("account").(types.Account).Username, currentRecord.OldLocation),
 	})
 
 	return c.Status(200).JSON(fiber.Map{
