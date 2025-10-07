@@ -95,11 +95,8 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	return c.JSON(
 		fiber.Map{
-			"data":          data,
-			"isEmpty":       len(data) == 0,
-			"res":           "Successfully readed!",
+			"items":         data,
 			"directoryInfo": directoryInfo,
-			"permissions":   c.Locals("account").(types.Account).Permissions,
 		},
 	)
 }
