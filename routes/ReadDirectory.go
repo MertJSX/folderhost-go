@@ -6,9 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"syscall"
+	"time"
 
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -20,24 +22,16 @@ func ReadDirectory(c *fiber.Ctx) error {
 	}
 
 	path := c.Query("folder")
-	mode := func() string {
-		switch c.Query("mode") {
-		case "Optimized mode":
-			return c.Query("mode")
-		case "Quality mode":
-			return c.Query("mode")
-		default:
-			return "Balanced mode"
-		}
-	}
+	mode := c.Query("mode")
 
-	if utils.LastChar(path) != "/" {
-		path += "/"
+	if mode != "Quality mode" && mode != "Optimized mode" {
+		mode = "Optimized mode"
 	}
 
 	config := &utils.Config
 	var dirPath string = fmt.Sprintf("%s%s", config.Folder, path)
 	directoryData, err := os.Stat(dirPath)
+	var pathCacheName string = dirPath
 
 	if os.IsNotExist(err) {
 		return c.Status(400).JSON(
@@ -55,6 +49,29 @@ func ReadDirectory(c *fiber.Ctx) error {
 		return c.Status(400).JSON(
 			fiber.Map{"err": "Unknown error!"},
 		)
+	}
+
+	dirCache, ok := cache.DirectoryCache.Get(pathCacheName)
+
+	if ok && dirCache.DirectoryInfo.DateModified != directoryData.ModTime() {
+		if ok {
+			cache.DirectoryCache.Delete(pathCacheName)
+		}
+		ok = false
+	}
+
+	if mode == "Quality mode" && dirCache.StorageInfo && ok {
+		fmt.Printf("Execute time (Cached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
+		return c.Status(200).JSON(fiber.Map{
+			"items":         dirCache.Items,
+			"directoryInfo": dirCache.DirectoryInfo,
+		})
+	} else if ok && mode != "Quality mode" {
+		fmt.Printf("Execute time (Cached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
+		return c.Status(200).JSON(fiber.Map{
+			"items":         dirCache.Items,
+			"directoryInfo": dirCache.DirectoryInfo,
+		})
 	}
 
 	trimmedPath := func() string {
@@ -84,7 +101,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		directoryInfo.StorageLimit = "UNLIMITED"
 	}
 
-	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode())
+	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode)
 
 	if mainDirectorySize != 0 {
 		directoryInfo.SizeBytes = mainDirectorySize
@@ -93,6 +110,13 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	directoryInfo.Id = -1
 
+	cache.DirectoryCache.Set(pathCacheName, types.ReadDirCache{
+		Items:         data,
+		DirectoryInfo: directoryInfo,
+		StorageInfo:   mode == "Quality mode",
+	}, 600*time.Second)
+
+	fmt.Printf("Execute time (Uncached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
 	return c.JSON(
 		fiber.Map{
 			"items":         data,

@@ -10,6 +10,8 @@ import (
 )
 
 func CheckAuth(c *fiber.Ctx) error {
+	// Temporary performance checking, it will be deleted in the next updates...
+	c.Locals("startTime", time.Now())
 	var body map[string]interface{}
 	var controlPassword bool = false
 	var username string = ""

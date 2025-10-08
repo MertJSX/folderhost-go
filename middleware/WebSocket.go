@@ -13,6 +13,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -152,8 +153,6 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 		})
 
 		handleUnzip(c, mt, message)
-	default:
-		log.Printf("Unknown message type: %s\n", message.Type)
 	}
 
 	return nil
@@ -329,5 +328,12 @@ func applyReplace(filePath string, lines []string, startLine, startCol, endLine,
 
 func writeFile(filepath string, lines []string) error {
 	content := strings.Join(lines, "\n")
+	// Personal opinion:
+	// I'm not using os.Stat then changing the existing cache
+	// because for example if no one looks for that path
+	// and everyone are writing something at the time
+	// we will loose much more time by checking os.Stat for the path
+	// it's better to delete the existing cache...
+	cache.DirectoryCache.Delete(utils.GetParentPath(filepath) + "/")
 	return os.WriteFile(filepath, []byte(content), 0644)
 }
