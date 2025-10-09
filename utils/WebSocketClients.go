@@ -62,11 +62,17 @@ func SendToAll(path string, mt int, message []byte) {
 	clientsMu.RLock()
 	defer clientsMu.RUnlock()
 
+	var wg sync.WaitGroup
 	for conn, clientPath := range clients {
 		if clientPath == path {
-			go safeWriteMessage(conn, mt, message)
+			wg.Add(1)
+			go func(c *websocket.Conn) {
+				defer wg.Done()
+				safeWriteMessage(c, mt, message)
+			}(conn)
 		}
 	}
+	wg.Wait()
 }
 
 func GetClientsCount(path string) int {
