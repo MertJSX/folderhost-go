@@ -4,11 +4,15 @@ import (
 	"time"
 )
 
-func CreateCache[KeyType string | int, DataType any](tick time.Ticker) *Cache[KeyType, DataType] {
+func CreateCache[KeyType string | int, DataType any](cleanupInterval time.Duration) *Cache[KeyType, DataType] {
 	cache := &Cache[KeyType, DataType]{
-		Items:  make(map[KeyType]CacheItem[DataType]),
-		Ticker: &tick,
+		Items: make(map[KeyType]CacheItem[DataType]),
 	}
-	go cache.Loop()
+
+	if cleanupInterval > 0 {
+		ticker := time.NewTicker(cleanupInterval)
+		cache.Ticker = ticker
+		go cache.Loop()
+	}
 	return cache
 }
