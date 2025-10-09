@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/MertJSX/folder-host-go/database/logs"
@@ -14,6 +15,7 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/fsnotify/fsnotify"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -60,7 +62,6 @@ func HandleWebsocket(c *websocket.Conn) {
 	var path string = c.Params("path")
 
 	path, err := url.PathUnescape(path)
-
 	if err != nil {
 		c.Close()
 		return
@@ -69,35 +70,64 @@ func HandleWebsocket(c *websocket.Conn) {
 	config := &utils.Config
 	path = config.Folder + path
 
+	if !utils.IsSafePath(path) {
+		c.Close()
+		return
+	}
+
 	utils.AddClient(c, path)
 	updateClientsCount(path)
 
 	defer updateClientsCount(path)
 	defer utils.RemoveClient(c)
+	defer log.Printf("WebSocket disconnected - User: %s, Path: %s\n", c.Locals("username").(string), path)
+	defer c.Close()
 
 	var username string = c.Locals("username").(string)
-
 	defer utils.TriggerPendingLog(username, path)
 
-	// websocket.Conn bindings https://pkg.go.dev/github.com/fasthttp/websocket?tab=doc#pkg-index
-	var (
-		mt  int
-		msg []byte
-	)
+	_, ok := cache.EditorWatcherCache.Get(path)
+	fileStat, err := os.Stat(path)
+	if err != nil {
+		return
+	}
+
+	if !ok {
+		cache.EditorWatcherCache.SetWithoutTTL(path, types.EditorWatcherCache{
+			LastModTime: fileStat.ModTime(),
+			IsWriting:   false,
+		})
+		if !fileStat.IsDir() {
+			channel := make(chan bool, 1)
+			go setupWatcher(path, channel)
+			defer func() {
+				go watcherDestroyer(path, channel)
+			}()
+		}
+	}
 
 	for {
-		if mt, msg, err = c.ReadMessage(); err != nil {
+		mt, msg, err := c.ReadMessage()
+		if err != nil {
 			log.Println("WebSocket read error:", err)
-			break
+			return
 		}
 
 		if err := processWebSocketMessage(msg, path, c, mt); err != nil {
 			log.Println("Message processing error:", err)
 		}
 	}
+}
 
-	log.Printf("WebSocket disconnected - User: %s, Path: %s", username, path)
-	c.Close()
+func watcherDestroyer(path string, ch chan bool) {
+	for {
+		if utils.GetClientsCount(path) == 0 {
+			cache.EditorWatcherCache.Delete(path)
+			ch <- true
+			return
+		}
+		time.Sleep(3 * time.Second)
+	}
 }
 
 func updateClientsCount(path string) {
@@ -109,6 +139,101 @@ func updateClientsCount(path string) {
 	if err == nil {
 		utils.SendToAll(path, 1, clientsCount)
 	}
+}
+
+func setupWatcher(path string, stopChan chan bool) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Println("Watcher creation error:", err)
+		return
+	}
+	defer watcher.Close()
+	defer fmt.Println("Stopped watching...")
+	defer close(stopChan)
+
+	err = watcher.Add(path)
+	if err != nil {
+		log.Println("Watcher add error:", err)
+		return
+	}
+
+	log.Printf("👀 Watching %s file...\n", path)
+
+	// On file changed by the host computer
+	for {
+		select {
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			watcherCache, ok := cache.EditorWatcherCache.Get(path)
+			if !ok {
+				return
+			}
+			onFileChanged(event, path, watcherCache)
+
+		case _, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+
+		case <-stopChan:
+			fmt.Printf("🛑 Watcher received stop signal: %s\n", path)
+			return
+		}
+	}
+
+}
+
+func onFileChanged(event fsnotify.Event, path string, watcherCache types.EditorWatcherCache) {
+	if !event.Has(fsnotify.Write) {
+		return
+	}
+
+	if watcherCache.IsWriting {
+		return
+	}
+
+	info, err := os.Stat(path)
+
+	if err != nil {
+		return
+	}
+	if info.ModTime() != watcherCache.LastModTime {
+		// file changed by host computer
+		watcherCache.LastModTime = info.ModTime()
+		cache.EditorWatcherCache.SetWithoutTTL(path, watcherCache)
+		// Send full content if filesize is lower than 100 KB
+		if info.Size() < 100*1024 {
+			sendFullContent(path)
+		} else {
+			sendReloadNotification(path)
+		}
+	}
+}
+
+func sendFullContent(path string) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+
+	msg, _ := json.Marshal(fiber.Map{
+		"type":      "full-content-update",
+		"content":   string(content),
+		"timestamp": time.Now().Unix(),
+	})
+
+	utils.SendToAll(path, websocket.TextMessage, msg)
+}
+
+func sendReloadNotification(path string) {
+	msg, _ := json.Marshal(fiber.Map{
+		"type":      "file-changed-externally",
+		"timestamp": time.Now().Unix(),
+	})
+
+	utils.SendToAll(path, websocket.TextMessage, msg)
 }
 
 func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt int) error {
@@ -328,12 +453,40 @@ func applyReplace(filePath string, lines []string, startLine, startCol, endLine,
 
 func writeFile(filepath string, lines []string) error {
 	content := strings.Join(lines, "\n")
-	// Personal opinion:
-	// I'm not using os.Stat then changing the existing cache
-	// because for example if no one looks for that path
-	// and everyone are writing something at the time
-	// we will loose much more time by checking os.Stat for the path
-	// it's better to delete the existing cache...
-	cache.DirectoryCache.Delete(utils.GetParentPath(filepath) + "/")
-	return os.WriteFile(filepath, []byte(content), 0644)
+
+	watcherCache, ok := cache.EditorWatcherCache.Get(filepath)
+	if !ok {
+		return fmt.Errorf("cannot get watcher cache")
+	}
+
+	watcherCache.IsWriting = true
+
+	cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
+
+	err := os.WriteFile(filepath, []byte(content), 0644)
+
+	if err != nil {
+		return err
+	}
+
+	fileStat, err := os.Stat(filepath)
+
+	if err != nil {
+		return err
+	}
+
+	watcherCache.LastModTime = fileStat.ModTime()
+	watcherCache.IsWriting = false
+
+	cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
+
+	if directoryCache, ok := cache.DirectoryCache.Get(utils.GetParentPath(filepath) + "/"); ok {
+		for index, v := range directoryCache.Items {
+			v.SizeBytes = fileStat.Size()
+			directoryCache.Items[index] = v
+		}
+		cache.DirectoryCache.Set(utils.GetParentPath(filepath)+"/", directoryCache, 600)
+	}
+
+	return nil
 }
