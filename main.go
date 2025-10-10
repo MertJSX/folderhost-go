@@ -9,6 +9,7 @@ import (
 
 	"github.com/MertJSX/folder-host-go/database/initialize"
 	"github.com/MertJSX/folder-host-go/middleware"
+	fhWS "github.com/MertJSX/folder-host-go/middleware/websocket"
 	_ "github.com/MertJSX/folder-host-go/resources"
 	"github.com/MertJSX/folder-host-go/routes"
 	"github.com/MertJSX/folder-host-go/utils"
@@ -54,13 +55,13 @@ func main() {
 
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
-			return middleware.WsConnect(c)
+			return fhWS.WsConnect(c)
 		}
 		return c.Next()
 	})
 
 	app.Get("/ws/:path", websocket.New(func(c *websocket.Conn) {
-		middleware.HandleWebsocket(c)
+		fhWS.HandleWebsocket(c)
 	}))
 
 	app.Use("/api", func(c *fiber.Ctx) error {
@@ -147,7 +148,6 @@ func main() {
 		return routes.Logs(c)
 	})
 
-	fmt.Println(utils.IsDevelopment())
 	if !utils.IsDevelopment() {
 		distFS, err := fs.Sub(FrontendFS, "client/dist")
 		if err != nil {
