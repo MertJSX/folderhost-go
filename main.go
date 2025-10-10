@@ -1,7 +1,11 @@
 package main
 
 import (
+	"embed"
 	"fmt"
+	"io/fs"
+	"log"
+	"net/http"
 
 	"github.com/MertJSX/folder-host-go/database/initialize"
 	"github.com/MertJSX/folder-host-go/middleware"
@@ -10,13 +14,35 @@ import (
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
+
+//go:embed client/dist/*
+var FrontendFS embed.FS
 
 func main() {
 	app := fiber.New(fiber.Config{
-		BodyLimit: 1000 * 1024 * 1024, // 1 GB
+		BodyLimit: 10 * 1024 * 1024, // 10 MB
 	})
+
+	app.Use(compress.New(compress.Config{
+		Level: compress.LevelBestSpeed,
+		Next: func(c *fiber.Ctx) bool {
+			skipRoutes := []string{
+				"/api/explorer/download",
+				"/api/upload",
+			}
+			for _, route := range skipRoutes {
+				if c.Path() == route {
+					return true
+				}
+			}
+			return false
+		},
+	}))
+
 	app.Use(cors.New())
 
 	utils.Setup()
@@ -121,11 +147,36 @@ func main() {
 		return routes.Logs(c)
 	})
 
-	app.Static("/", "client/dist")
+	fmt.Println(utils.IsDevelopment())
+	if !utils.IsDevelopment() {
+		distFS, err := fs.Sub(FrontendFS, "client/dist")
+		if err != nil {
+			log.Fatal("Error creating sub FS:", err)
+		}
 
-	app.Get("*", func(c *fiber.Ctx) error {
-		return c.SendFile("client/dist/index.html")
-	})
+		app.Use("/", filesystem.New(filesystem.Config{
+			Root:         http.FS(distFS),
+			Index:        "index.html",
+			NotFoundFile: "index.html",
+			MaxAge:       86400, // 1 day cache
+		}))
+
+		app.Get("*", func(c *fiber.Ctx) error {
+			indexFile, err := distFS.Open("index.html")
+			if err != nil {
+				return c.Status(404).SendString("Not Found")
+			}
+			defer indexFile.Close()
+
+			stat, err := indexFile.Stat()
+			if err != nil {
+				return c.Status(500).SendString("Internal Server Error")
+			}
+
+			c.Type("html")
+			return c.SendStream(indexFile, int(stat.Size()))
+		})
+	}
 
 	app.Listen(PORT)
 }
