@@ -48,10 +48,15 @@ func main() {
 
 	utils.Setup()
 	utils.GetConfig()
-
 	initialize.InitializeDatabase()
 
-	var PORT string = fmt.Sprintf(":%d", utils.Config.Port)
+	go utils.AutoClearOldLogs()
+
+	var portInt int = utils.Config.Port
+	if portInt == 0 {
+		portInt = 5000
+	}
+	var PORT string = fmt.Sprintf(":%d", portInt)
 
 	app.Use("/ws", func(c *fiber.Ctx) error {
 		if websocket.IsWebSocketUpgrade(c) {
@@ -178,5 +183,7 @@ func main() {
 		})
 	}
 
-	app.Listen(PORT)
+	if err := app.Listen(PORT); err != nil {
+		log.Fatalf("Server error: %v", err)
+	}
 }

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/resources"
 )
 
@@ -20,6 +22,7 @@ func Setup() {
 		os.RemoveAll("tmp")
 		os.Mkdir("tmp", 0700)
 	}
+
 	if IsNotExistingPath("./config.yml") {
 		fmt.Println("Creating config file...")
 		configContent, err := resources.DefaultConfig.ReadFile("default_config.yml")
@@ -41,6 +44,29 @@ func Setup() {
 
 		if err != nil {
 			log.Fatalf("Error creating recovery_bin folder!")
+		}
+	}
+}
+
+func AutoClearOldLogs() {
+	ticker := time.NewTicker(24 * time.Hour)
+	defer ticker.Stop()
+
+	if Config.ClearLogsAfter > 0 {
+		err := logs.ClearOldLogs(Config.ClearLogsAfter)
+		if err != nil {
+			fmt.Printf("Error while clearing old logs: %s\n", err)
+		}
+	} else {
+		return
+	}
+
+	for range ticker.C {
+		if Config.ClearLogsAfter > 0 {
+			err := logs.ClearOldLogs(Config.ClearLogsAfter)
+			if err != nil {
+				fmt.Printf("Error while clearing old logs: %s\n", err)
+			}
 		}
 	}
 }
