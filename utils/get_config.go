@@ -12,7 +12,6 @@ import (
 var Config types.ConfigFile
 
 func GetConfig() {
-	// fileData, err := resources.DefaultConfig.ReadFile("default_config.yml")
 	fileData, err := os.ReadFile("./config.yml")
 
 	if err != nil {

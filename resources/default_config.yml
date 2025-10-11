@@ -46,5 +46,8 @@ bin_storage_limit: "10 GB"
 # Enable/Disable logging activities
 log_activities: true
 
+# Clears logs automatically after some days. If you want to disable it set the value to 0.
+clear_logs_after: 7 # Days
+
 # Enable/Disable getting foldersize on start
 get_foldersize_on_start: true
