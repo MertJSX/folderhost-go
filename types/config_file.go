@@ -13,4 +13,5 @@ type ConfigFile struct {
 	BinStorageLimit      string  `yaml:"bin_storage_limit"`
 	LogActivities        bool    `yaml:"log_activities"`
 	GetFoldersizeOnStart bool    `yaml:"get_foldersize_on_start"`
+	ClearLogsAfter       int     `yaml:"clear_logs_after"`
 }
