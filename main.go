@@ -13,6 +13,8 @@ import (
 	_ "github.com/MertJSX/folder-host-go/resources"
 	"github.com/MertJSX/folder-host-go/routes"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/MertJSX/folder-host-go/utils/tasks"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -50,7 +52,14 @@ func main() {
 	utils.GetConfig()
 	initialize.InitializeDatabase()
 
-	go utils.AutoClearOldLogs()
+	go tasks.AutoClearOldLogs()
+
+	var err error
+	cache.RemainingFolderSpace, err = utils.GetRemainingFolderSpace()
+
+	if err != nil {
+		log.Fatalf("Error while getting remaining folder space: %v\n", err)
+	}
 
 	var portInt int = utils.Config.Port
 	if portInt == 0 {
