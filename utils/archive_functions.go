@@ -22,11 +22,16 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 	}
 
 	var (
-		totalSize            int64 = 0
-		remainingFolderSpace int64 = GetRemainingFolderSpace()
-		currentUID           int   = os.Getuid()
-		currentGID           int   = os.Getgid()
+		totalSize  int64 = 0
+		currentUID int   = os.Getuid()
+		currentGID int   = os.Getgid()
 	)
+
+	remainingFolderSpace, err := GetRemainingFolderSpace()
+
+	if err != nil {
+		return fmt.Errorf("cannot get remaining folder space: %v", err)
+	}
 
 	for _, file := range r.File {
 		fmt.Printf("Process: %s\n", ConvertBytesToString(totalSize))

@@ -213,6 +213,10 @@ func applyReplace(filePath string, lines []string, startLine, startCol, endLine,
 func writeFile(filepath string, lines []string) error {
 	content := strings.Join(lines, "\n")
 
+	if len(content) > 200*1024 {
+		return fmt.Errorf("file size exceeds 200 KB: %d Bytes", len(content))
+	}
+
 	watcherCache, ok := cache.EditorWatcherCache.Get(filepath)
 	if !ok {
 		return fmt.Errorf("cannot get watcher cache")

@@ -40,7 +40,10 @@ func CreateCopy(c *fiber.Ctx) error {
 		copyPath = fmt.Sprintf("%s/%s%s", parentPath, basename, extname)
 		if config.StorageLimit != "" {
 			fileSize := pathStat.Size()
-			remainingFreeSpace := utils.GetRemainingFolderSpace()
+			remainingFreeSpace, err := utils.GetRemainingFolderSpace()
+			if err != nil {
+				return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
+			}
 
 			if fileSize > remainingFreeSpace {
 				return c.Status(507).JSON(fiber.Map{"err": "Not enough space!"})
@@ -63,7 +66,10 @@ func CreateCopy(c *fiber.Ctx) error {
 			if err != nil {
 				return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
 			}
-			remainingFreeSpace := utils.GetRemainingFolderSpace()
+			remainingFreeSpace, err := utils.GetRemainingFolderSpace()
+			if err != nil {
+				return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
+			}
 
 			if folderSize > remainingFreeSpace {
 				return c.Status(507).JSON(fiber.Map{"err": "Not enough space!"})

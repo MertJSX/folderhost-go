@@ -33,7 +33,7 @@ func ReadFile(c *fiber.Ctx) error {
 	path = c.Query("filepath")
 
 	if utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.Folder, path)) {
-		return c.Status(200).JSON(fiber.Map{"err": "Filepath is not existing!"})
+		return c.Status(400).JSON(fiber.Map{"err": "Filepath is not existing!"})
 	}
 
 	itemStat, err = os.Stat(fmt.Sprintf("%s%s", config.Folder, path))
@@ -46,7 +46,11 @@ func ReadFile(c *fiber.Ctx) error {
 	}
 
 	if itemStat.IsDir() {
-		return c.Status(200).JSON(fiber.Map{"err": "Filepath is directory!"})
+		return c.Status(400).JSON(fiber.Map{"err": "Filepath is directory!"})
+	}
+
+	if itemStat.Size() > 200*1024 {
+		return c.Status(413).JSON(fiber.Map{"err": "File is too large!"})
 	}
 
 	content, err := os.ReadFile(fmt.Sprintf("%s%s", config.Folder, path))

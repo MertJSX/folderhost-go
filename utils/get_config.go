@@ -23,5 +23,7 @@ func GetConfig() {
 		log.Fatalf("Config.yml parse error: %v", err)
 	}
 
+	Config.SizeBytes = ConvertStringToBytes(Config.StorageLimit)
+
 	Config.Folder = strings.TrimPrefix(Config.Folder, "./")
 }

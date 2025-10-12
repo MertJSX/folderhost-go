@@ -43,7 +43,11 @@ func RecoverItem(c *fiber.Ctx) error {
 	}
 
 	if utils.Config.StorageLimit != "UNLIMITED" {
-		remainingFreeSpace := utils.GetRemainingFolderSpace()
+		remainingFreeSpace, err := utils.GetRemainingFolderSpace()
+
+		if err != nil {
+			return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
+		}
 
 		if currentRecord.SizeBytes > remainingFreeSpace {
 			return c.Status(413).JSON(fiber.Map{"err": "This item exceeds the storage limit!"})
