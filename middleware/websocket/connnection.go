@@ -30,7 +30,22 @@ func HandleWebsocket(c *websocket.Conn) {
 		return
 	}
 
-	utils.AddClient(c, path)
+	fileStat, err := os.Stat(path)
+	if err != nil {
+		return
+	}
+
+	if utils.IsExistingWSConnectionPath(path) || fileStat.IsDir() {
+		utils.AddClient(c, path, fileStat.IsDir())
+	} else {
+		freeSpace, _ := utils.GetRemainingFolderSpace()
+		if freeSpace >= (200 * 1024) {
+			utils.AddClient(c, path, fileStat.IsDir())
+		} else {
+			return
+		}
+	}
+
 	updateClientsCount(path)
 
 	defer updateClientsCount(path)
@@ -42,10 +57,6 @@ func HandleWebsocket(c *websocket.Conn) {
 	defer utils.TriggerPendingLog(username, path)
 
 	_, ok := cache.EditorWatcherCache.Get(path)
-	fileStat, err := os.Stat(path)
-	if err != nil {
-		return
-	}
 
 	if !ok {
 		cache.EditorWatcherCache.SetWithoutTTL(path, types.EditorWatcherCache{

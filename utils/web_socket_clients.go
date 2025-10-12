@@ -7,16 +7,24 @@ import (
 )
 
 var (
-	clients       = make(map[*websocket.Conn]string) // conn -> path
+	clients       = make(map[*websocket.Conn]ClientInfo) // conn -> path
 	clientsMu     sync.RWMutex
 	connMutexes   = make(map[*websocket.Conn]*sync.Mutex)
 	connMutexesMu sync.RWMutex
 )
 
-func AddClient(conn *websocket.Conn, path string) {
+type ClientInfo struct {
+	Path        string
+	IsDirectory bool
+}
+
+func AddClient(conn *websocket.Conn, path string, isDirectory bool) {
 	clientsMu.Lock()
 	defer clientsMu.Unlock()
-	clients[conn] = path
+	clients[conn] = ClientInfo{
+		Path:        path,
+		IsDirectory: isDirectory,
+	}
 
 	connMutexesMu.Lock()
 	defer connMutexesMu.Unlock()
@@ -51,8 +59,8 @@ func SendToAllExclude(path string, mt int, message []byte, exclude *websocket.Co
 	clientsMu.RLock()
 	defer clientsMu.RUnlock()
 
-	for conn, clientPath := range clients {
-		if clientPath == path && conn != exclude {
+	for conn, client := range clients {
+		if client.Path == path && conn != exclude {
 			go safeWriteMessage(conn, mt, message)
 		}
 	}
@@ -63,8 +71,8 @@ func SendToAll(path string, mt int, message []byte) {
 	defer clientsMu.RUnlock()
 
 	var wg sync.WaitGroup
-	for conn, clientPath := range clients {
-		if clientPath == path {
+	for conn, client := range clients {
+		if client.Path == path {
 			wg.Add(1)
 			go func(c *websocket.Conn) {
 				defer wg.Done()
@@ -79,10 +87,36 @@ func GetClientsCount(path string) int {
 	clientsMu.RLock()
 	defer clientsMu.RUnlock()
 	count := 0
-	for _, clientPath := range clients {
-		if clientPath == path {
+	for _, client := range clients {
+		if client.Path == path {
 			count++
 		}
 	}
 	return count
+}
+
+func GetActiveFileCount() int {
+	clientsMu.RLock()
+	defer clientsMu.RUnlock()
+
+	uniqueFiles := make(map[string]bool)
+	for _, clientInfo := range clients {
+		if !clientInfo.IsDirectory {
+			uniqueFiles[clientInfo.Path] = true
+		}
+	}
+	return len(uniqueFiles)
+}
+
+func IsExistingWSConnectionPath(path string) bool {
+	clientsMu.RLock()
+	defer clientsMu.RUnlock()
+
+	for _, clientInfo := range clients {
+		if clientInfo.Path == path {
+			return true
+		}
+	}
+
+	return false
 }
