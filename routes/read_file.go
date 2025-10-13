@@ -53,6 +53,10 @@ func ReadFile(c *fiber.Ctx) error {
 		return c.Status(413).JSON(fiber.Map{"err": "File is too large!"})
 	}
 
+	if remainingSize, _ := utils.GetRemainingFolderSpace(); remainingSize < 200*1024 {
+		return c.Status(413).JSON(fiber.Map{"err": "Not enough storage space to edit! Try to close unused CodeEditor windows. Each code editor window guarantees itself 200 KB of space."})
+	}
+
 	content, err := os.ReadFile(fmt.Sprintf("%s%s", config.Folder, path))
 
 	if err != nil {

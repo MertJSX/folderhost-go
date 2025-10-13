@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 func GetRemainingFolderSpace() (int64, error) {
 	mainFolderSize, _, err := GetDirectorySize(Config.Folder)
 
@@ -10,7 +12,7 @@ func GetRemainingFolderSpace() (int64, error) {
 	fileCount := GetActiveFileCount()
 	editorUsage := int64(fileCount * 200 * 1024)
 
-	// fmt.Printf("Editor usage: %d KB\n", editorUsage/1024)
+	fmt.Printf("Editor usage: %d KB\n", editorUsage/1024)
 
 	return Config.SizeBytes - (mainFolderSize + editorUsage), nil
 }
