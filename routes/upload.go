@@ -85,11 +85,44 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	totalChunks := c.FormValue("totalChunks")
 	fileName := c.FormValue("fileName")
 	total, _ := strconv.ParseInt(totalChunks, 10, 64)
-	// fileSize := total * form.File["file"][0].Size
+	currentChunk, _ := strconv.Atoi(chunkIndex)
 
-	// mainFolderSize := utils.GetDirectorySizeAsync()
+	if total == 1 {
+		file, err := form.File["file"][0].Open()
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"err": "Couldn't open file",
+			})
+		}
+		defer file.Close()
 
-	// Save chunk as temp file
+		finalPath := filepath.Join(config.Folder, targetPath, fileName)
+		outFile, err := os.Create(finalPath)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"err": "Couldn't create file",
+			})
+		}
+		defer outFile.Close()
+
+		if _, err := io.Copy(outFile, file); err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"err": "Couldn't save file",
+			})
+		}
+
+		logs.CreateLog(types.AuditLog{
+			Username:    c.Locals("account").(types.Account).Username,
+			Action:      "Upload",
+			Description: fmt.Sprintf("%s uploaded a %s file.", c.Locals("account").(types.Account).Username, fileName),
+		})
+
+		return c.JSON(fiber.Map{
+			"response": "Successfully uploaded!",
+			"uploaded": true,
+		})
+	}
+
 	chunkPath := filepath.Join("./tmp", fileID+"_"+chunkIndex)
 	chunkFile, err := form.File["file"][0].Open()
 	if err != nil {
@@ -129,7 +162,6 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	}
 
 	// Merge all chunks
-	currentChunk, _ := strconv.Atoi(chunkIndex)
 	if currentChunk == int(total)-1 { // If it's the last chunk
 		finalPath := filepath.Join(config.Folder, targetPath, fileName)
 		if err := mergeChunks(fileID, finalPath, int(total)); err != nil {
@@ -141,7 +173,7 @@ func ChunkedUpload(c *fiber.Ctx) error {
 		logs.CreateLog(types.AuditLog{
 			Username:    c.Locals("account").(types.Account).Username,
 			Action:      "Upload",
-			Description: fmt.Sprintf("%s uploaded a %s%s file.", c.Locals("account").(types.Account).Username, finalPath, fileName),
+			Description: fmt.Sprintf("%s uploaded a %s file.", c.Locals("account").(types.Account).Username, fileName),
 		})
 
 		return c.JSON(fiber.Map{
