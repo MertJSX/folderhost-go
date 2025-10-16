@@ -12,6 +12,7 @@ import (
 	fhWS "github.com/MertJSX/folder-host-go/middleware/websocket"
 	_ "github.com/MertJSX/folder-host-go/resources"
 	"github.com/MertJSX/folder-host-go/routes"
+	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/tasks"
 	"github.com/gofiber/contrib/websocket"
@@ -72,6 +73,12 @@ func main() {
 
 	app.Use("/api", func(c *fiber.Ctx) error {
 		return middleware.CheckAuth(c)
+	})
+
+	app.Get("/api/user-info", func(c *fiber.Ctx) error {
+		return c.Status(200).JSON(fiber.Map{
+			"username": c.Locals("account").(types.Account).Username,
+		})
 	})
 
 	app.Get("/api/read-file", func(c *fiber.Ctx) error {
