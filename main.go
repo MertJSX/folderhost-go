@@ -14,6 +14,7 @@ import (
 	"github.com/MertJSX/folder-host-go/routes"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/MertJSX/folder-host-go/utils/tasks"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -52,6 +53,7 @@ func main() {
 	utils.GetConfig()
 	initialize.InitializeDatabase()
 
+	go cache.ListenDirectorySetCacheEvents()
 	go tasks.AutoClearOldLogs()
 
 	var portInt int = utils.Config.Port

@@ -8,4 +8,5 @@ func (c *Cache[KeyType, DataType]) SetWithoutTTL(key KeyType, data DataType) {
 		LifeTime: 0,
 		Data:     data,
 	}
+	c.SetCacheEvent <- key
 }
