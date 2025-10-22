@@ -10,6 +10,7 @@ func CreateCache[KeyType string | int, DataType any](cleanupInterval time.Durati
 	}
 
 	cache.SetCacheEvent = make(chan KeyType, 100)
+	cache.TimeoutCacheEvent = make(chan CacheEvent[KeyType, DataType], 100)
 
 	if cleanupInterval > 0 {
 		ticker := time.NewTicker(cleanupInterval)

@@ -84,8 +84,10 @@ func onFileChanged(event fsnotify.Event, path string, watcherCache types.EditorW
 	if err != nil {
 		return
 	}
+
 	if info.ModTime() != watcherCache.LastModTime {
 		// file changed by host computer
+		fmt.Println("File changed by host PC!")
 		watcherCache.LastModTime = info.ModTime()
 		cache.EditorWatcherCache.SetWithoutTTL(path, watcherCache)
 		// Send full content if filesize is lower than 200 KB

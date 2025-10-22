@@ -54,6 +54,7 @@ func main() {
 	initialize.InitializeDatabase()
 
 	go cache.ListenDirectorySetCacheEvents()
+	go cache.ListenFileContentCacheEvents()
 	go tasks.AutoClearOldLogs()
 
 	var portInt int = utils.Config.Port
