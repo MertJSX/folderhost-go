@@ -6,6 +6,7 @@ import (
 
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -57,10 +58,16 @@ func ReadFile(c *fiber.Ctx) error {
 		return c.Status(413).JSON(fiber.Map{"err": "Not enough storage space to edit! Try to close unused CodeEditor windows. Each code editor window guarantees itself 200 KB of space."})
 	}
 
-	content, err := os.ReadFile(fmt.Sprintf("%s%s", config.Folder, path))
+	var content string
+	var ok bool
 
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"err": "Error while reading file!"})
+	if content, ok = cache.FileContentCache.Get(fmt.Sprintf("%s%s", config.Folder, path)); !ok {
+		fileContent, err := os.ReadFile(fmt.Sprintf("%s%s", config.Folder, path))
+		content = string(fileContent)
+
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"err": "Error while reading file!"})
+		}
 	}
 
 	return c.Status(200).JSON(fiber.Map{

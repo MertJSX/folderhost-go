@@ -235,7 +235,6 @@ func writeFile(filepath string, lines []string) error {
 
 	cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
 
-	// err := os.WriteFile(filepath, []byte(content), 0644)
 	cache.FileContentCache.Set(filepath, content, time.Second*2)
 
 	return nil
