@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 	"unicode/utf8"
 
 	"github.com/MertJSX/folder-host-go/database/logs"
@@ -64,17 +63,9 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 }
 
 func applyEditorChange(filePath string, change types.ChangeData) error {
-
-	var content string
-	content, ok := cache.FileContentCache.Get(filePath)
-
-	if !ok {
-		fileContent, err := os.ReadFile(filePath)
-		if err != nil {
-			return err
-		}
-		content = string(fileContent)
-		cache.FileContentCache.Set(filePath, content, time.Second*2)
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
 	}
 
 	lines := strings.Split(string(content), "\n")
@@ -228,14 +219,42 @@ func writeFile(filepath string, lines []string) error {
 
 	watcherCache, ok := cache.EditorWatcherCache.Get(filepath)
 	if !ok {
-		return fmt.Errorf("cannot get watcher cache")
+		return nil
 	}
 
 	watcherCache.IsWriting = true
 
 	cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
 
-	cache.FileContentCache.Set(filepath, content, time.Second*2)
+	err := os.WriteFile(filepath, []byte(content), 0644)
 
+	if err != nil {
+		watcherCache.IsWriting = false
+		cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
+
+		return err
+	}
+
+	fileStat, err := os.Stat(filepath)
+
+	if err != nil {
+		watcherCache.IsWriting = false
+		cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
+
+		return err
+	}
+
+	watcherCache.LastModTime = fileStat.ModTime()
+	watcherCache.IsWriting = false
+
+	cache.EditorWatcherCache.SetWithoutTTL(filepath, watcherCache)
+
+	if directoryCache, ok := cache.DirectoryCache.Get(utils.GetParentPath(filepath) + "/"); ok {
+		for index, v := range directoryCache.Items {
+			v.SizeBytes = fileStat.Size()
+			directoryCache.Items[index] = v
+		}
+		cache.DirectoryCache.Set(utils.GetParentPath(filepath)+"/", directoryCache, 600)
+	}
 	return nil
 }
