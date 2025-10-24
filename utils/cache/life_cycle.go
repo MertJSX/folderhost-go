@@ -11,9 +11,11 @@ func (c *Cache[KeyType, DataType]) LifeCycle() {
 			continue
 		}
 		if item.LifeTime < unixtime {
-			c.TimeoutCacheEvent <- CacheEvent[KeyType, DataType]{
-				Key:  key,
-				Data: item.Data,
+			if c.Properties.TimeoutCacheEvent {
+				c.TimeoutCacheEvent <- CacheEvent[KeyType, DataType]{
+					Key:  key,
+					Data: item.Data,
+				}
 			}
 			delete(c.Items, key)
 		}

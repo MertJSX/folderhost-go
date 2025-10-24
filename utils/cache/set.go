@@ -10,5 +10,7 @@ func (c *Cache[KeyType, DataType]) Set(key KeyType, data DataType, duration time
 		Data:     data,
 	}
 	c.Items[key] = item
-	c.SetCacheEvent <- key
+	if c.Properties.SetCacheEvent {
+		c.SetCacheEvent <- key
+	}
 }

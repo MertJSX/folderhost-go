@@ -11,6 +11,7 @@ type Cache[KeyType int | string, DataType any] struct {
 	Ticker            *time.Ticker
 	SetCacheEvent     chan KeyType // index
 	TimeoutCacheEvent chan CacheEvent[KeyType, DataType]
+	Properties        CacheProperties
 }
 
 type CacheEvent[KeyType int | string, DataType any] struct {
@@ -21,4 +22,9 @@ type CacheEvent[KeyType int | string, DataType any] struct {
 type CacheItem[DataType any] struct {
 	Data     DataType
 	LifeTime int64
+}
+
+type CacheProperties struct {
+	SetCacheEvent     bool
+	TimeoutCacheEvent bool
 }
