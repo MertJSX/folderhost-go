@@ -1,13 +1,14 @@
 package utils
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/gofiber/contrib/websocket"
 )
 
 var (
-	clients       = make(map[*websocket.Conn]ClientInfo) // conn -> path
+	clients       = make(map[*websocket.Conn]ClientInfo) // conn -> path, isdir
 	clientsMu     sync.RWMutex
 	connMutexes   = make(map[*websocket.Conn]*sync.Mutex)
 	connMutexesMu sync.RWMutex
@@ -119,4 +120,20 @@ func IsExistingWSConnectionPath(path string) bool {
 	}
 
 	return false
+}
+
+func ChangePath(clientConn *websocket.Conn, path string, isDir bool) error {
+	clientsMu.RLock()
+	defer clientsMu.RUnlock()
+
+	for conn, clientInfo := range clients {
+		if conn == clientConn {
+			clientInfo.Path = path
+			clientInfo.IsDirectory = isDir
+			clients[clientConn] = clientInfo
+			return nil
+		}
+	}
+
+	return fmt.Errorf("client not found")
 }

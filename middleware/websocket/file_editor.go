@@ -3,6 +3,7 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"unicode/utf8"
@@ -39,6 +40,33 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 
 		utils.SendToAllExclude(filePath, mt, msg, c)
 		return applyEditorChange(filePath, message.Change)
+	case "change-path":
+		if !account.Permissions.ReadDirectories {
+			permissionError, _ := json.Marshal(fiber.Map{
+				"type":  "error",
+				"error": "You don't have permission to read-directories!",
+			})
+
+			c.WriteMessage(mt, permissionError)
+			return nil
+		}
+
+		path := utils.Config.Folder + "/" + message.Path
+
+		if !utils.IsSafePath(path) {
+			c.Close()
+			return fmt.Errorf("path traversal security issue")
+		}
+
+		log.Printf("Change path: %s\n", path)
+
+		fileStat, err := os.Stat(path)
+		if err != nil {
+			c.Close()
+			return fmt.Errorf("unknown error")
+		}
+
+		return utils.ChangePath(c, path, fileStat.IsDir())
 	case "unzip":
 		if !account.Permissions.Extract {
 			permissionError, _ := json.Marshal(fiber.Map{
