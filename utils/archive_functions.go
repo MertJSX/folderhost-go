@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -34,10 +35,10 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 	}
 
 	for _, file := range r.File {
-		fmt.Printf("Process: %s\n", ConvertBytesToString(totalSize))
 		cb(totalSize, false, "") // Parameters: totalSize, isCompleted, abortMsg
 		err := extractFile(file, dest, &totalSize, currentUID, currentGID)
 		if err != nil {
+			log.Printf("Unzip error: %v\n", err)
 			return fmt.Errorf("unable to extract file (%s): %v", file.Name, err)
 		}
 		if totalSize > remainingFolderSpace {
