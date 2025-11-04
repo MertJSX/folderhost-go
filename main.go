@@ -16,6 +16,7 @@ import (
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
 	"github.com/MertJSX/folder-host-go/utils/tasks"
+	"github.com/fatih/color"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -28,7 +29,9 @@ var FrontendFS embed.FS
 
 func main() {
 	app := fiber.New(fiber.Config{
-		BodyLimit: 10 * 1024 * 1024, // 10 MB
+		BodyLimit:             10 * 1024 * 1024, // 10 MB
+		AppName:               "FolderHost",
+		DisableStartupMessage: true,
 	})
 
 	app.Use(compress.New(compress.Config{
@@ -192,6 +195,22 @@ func main() {
 			return c.SendStream(indexFile, int(stat.Size()))
 		})
 	}
+
+	asciiFormat := color.New(color.FgCyan).Add(color.Bold)
+	sign := color.New(color.FgHiCyan).Add(color.Italic).Add(color.Underline)
+	asciiFormat.Print(`
+      _______   __   __
+     / _____/  / /  / /
+    / /__     / /__/ /
+   / ___/    / ___  /
+  / /       / /  / /
+ /_/       /_/  /_/  `)
+	sign.Print("By MertJSX\n")
+	defaultText := color.New(color.FgWhite)
+	defaultText.Printf("\nThe server has started on port %d!\n", portInt)
+	defaultText.Print("URL: ")
+	urlFormat := color.New(color.FgYellow)
+	urlFormat.Printf("http://127.0.0.1:%d\n\n", portInt)
 
 	if err := app.Listen(PORT); err != nil {
 		log.Fatalf("Server error: %v", err)
