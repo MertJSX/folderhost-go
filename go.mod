@@ -10,6 +10,7 @@ require (
 
 require (
 	github.com/fasthttp/websocket v1.5.8 // indirect
+	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/savsgio/gotils v0.0.0-20240303185622-093b76447511 // indirect
