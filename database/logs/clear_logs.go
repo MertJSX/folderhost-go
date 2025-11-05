@@ -48,6 +48,10 @@ func ClearOldLogs(days int) error {
 		return fmt.Errorf("error committing db changes: %w", err)
 	}
 
+	if rowsAffected < 1 {
+		return nil
+	}
+
 	log.Printf("Successfully cleared %d old log records (older than %d days)", rowsAffected, days)
 	return nil
 }
