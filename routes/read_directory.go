@@ -68,7 +68,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 			"directoryInfo": dirCache.DirectoryInfo,
 		})
 	} else if ok && mode != "Quality mode" {
-		fmt.Printf("Execute time (Cached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
+		// fmt.Printf("Execute time (Cached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
 		return c.Status(200).JSON(fiber.Map{
 			"items":         dirCache.Items,
 			"directoryInfo": dirCache.DirectoryInfo,

@@ -51,7 +51,7 @@ func HandleWebsocket(c *websocket.Conn) {
 
 	defer updateClientsCount(path)
 	defer utils.RemoveClient(c)
-	defer log.Printf("WebSocket disconnected - User: %s, Path: %s\n", c.Locals("username").(string), path)
+	// defer log.Printf("WebSocket disconnected - User: %s, Path: %s\n", c.Locals("username").(string), path)
 	defer c.Close()
 
 	var username string = c.Locals("username").(string)
@@ -76,7 +76,7 @@ func HandleWebsocket(c *websocket.Conn) {
 	for {
 		mt, msg, err := c.ReadMessage()
 		if err != nil {
-			log.Println("WebSocket read error:", err)
+			// log.Println("WebSocket read error:", err)
 			return
 		}
 
