@@ -6,7 +6,7 @@ import (
 
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
-	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,7 +18,7 @@ func Download(c *fiber.Ctx) error {
 		)
 	}
 
-	config := &utils.Config
+	config := &config.Config
 	path := c.Query("filepath")
 	filepath := fmt.Sprintf("%s%s", config.Folder, path)
 

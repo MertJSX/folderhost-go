@@ -8,6 +8,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,7 +20,7 @@ func CreateCopy(c *fiber.Ctx) error {
 		copyPath   string
 		extname    string            = ""
 		account    types.Account     = c.Locals("account").(types.Account)
-		config     *types.ConfigFile = &utils.Config
+		config     *types.ConfigFile = &config.Config
 	)
 
 	if !account.Permissions.Copy {

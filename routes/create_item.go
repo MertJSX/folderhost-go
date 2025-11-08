@@ -8,6 +8,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -16,7 +17,7 @@ func CreateItem(c *fiber.Ctx) error {
 		itemPath string            = c.Query("path")
 		itemName string            = c.Query("itemName")
 		account  types.Account     = c.Locals("account").(types.Account)
-		config   *types.ConfigFile = &utils.Config
+		config   *types.ConfigFile = &config.Config
 		isFolder bool
 	)
 

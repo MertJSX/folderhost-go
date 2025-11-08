@@ -6,6 +6,7 @@ import (
 
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,7 +16,7 @@ func ReadFile(c *fiber.Ctx) error {
 	var lastModified string
 	var itemStat os.FileInfo
 	var err error
-	config := &utils.Config
+	config := &config.Config
 
 	if !c.Locals("account").(types.Account).Permissions.ReadFiles {
 		return c.Status(403).JSON(fiber.Map{"err": "No permission!"})

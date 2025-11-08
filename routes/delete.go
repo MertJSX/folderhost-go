@@ -9,6 +9,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -20,7 +21,7 @@ func Delete(c *fiber.Ctx) error {
 		)
 	}
 
-	config := &utils.Config
+	config := &config.Config
 
 	path := fmt.Sprintf("%s%s", config.Folder, c.Query("path"))
 

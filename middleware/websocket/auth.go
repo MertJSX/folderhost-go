@@ -5,6 +5,7 @@ import (
 
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,7 +29,7 @@ func WsConnect(c *fiber.Ctx) error {
 		})
 	}
 
-	username, err := utils.VerifyToken(token, utils.Config.SecretJwtKey)
+	username, err := utils.VerifyToken(token, config.Config.SecretJwtKey)
 	if err != nil {
 		return c.Status(401).JSON(fiber.Map{"error": "invalid token"})
 	}

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/MertJSX/folder-host-go/resources"
+	"github.com/MertJSX/folder-host-go/utils/config"
 )
 
 func Setup() {
@@ -36,7 +37,7 @@ func Setup() {
 		}
 	}
 
-	if IsNotExistingPath("recovery_bin") && Config.RecoveryBin {
+	if IsNotExistingPath("recovery_bin") && config.Config.RecoveryBin {
 		fmt.Println("Creating /recovery_bin folder...")
 		err := os.Mkdir("recovery_bin", 0700)
 

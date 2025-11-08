@@ -11,11 +11,12 @@ import (
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Upload(c *fiber.Ctx) error {
-	config := &utils.Config
+	config := &config.Config
 	targetPath := c.Query("path", "")
 	if targetPath == "" {
 		return c.Status(400).JSON(fiber.Map{
@@ -66,7 +67,7 @@ func ChunkedUpload(c *fiber.Ctx) error {
 			fiber.Map{"err": "No permission!"},
 		)
 	}
-	config := &utils.Config
+	config := &config.Config
 	targetPath := c.Query("path")
 	if targetPath == "" {
 		return c.Status(400).JSON(fiber.Map{

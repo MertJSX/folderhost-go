@@ -15,6 +15,7 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/MertJSX/folder-host-go/utils/tasks"
 	"github.com/fatih/color"
 	"github.com/gofiber/contrib/websocket"
@@ -59,7 +60,8 @@ func main() {
 	go cache.ListenDirectorySetCacheEvents()
 	go tasks.AutoClearOldLogs()
 
-	var portInt int = utils.Config.Port
+	config := &config.Config
+	var portInt int = config.Port
 	if portInt == 0 {
 		portInt = 5000
 	}
@@ -206,11 +208,31 @@ func main() {
   / /       / /  / /
  /_/       /_/  /_/  `)
 	sign.Print("By MertJSX\n")
-	defaultText := color.New(color.FgWhite)
+	defaultText := color.RGB(169, 169, 169)
+	greenText := color.New(color.FgGreen)
+	errorText := color.New(color.FgRed)
+	warningText := color.New(color.FgYellow)
 	defaultText.Printf("\nThe server has started on port %d!\n", portInt)
 	defaultText.Print("URL: ")
-	urlFormat := color.New(color.FgYellow)
-	urlFormat.Printf("http://127.0.0.1:%d\n\n", portInt)
+	warningText.Printf("http://127.0.0.1:%d\n", portInt)
+
+	if config.GetFoldersizeOnStart {
+		_, size, err := utils.GetDirectorySize(config.Folder)
+		if err != nil {
+			errorText.Printf("\nError while getting foldersize:\n %v\n", err)
+			return
+		}
+		defaultText.Print("Folder size: ")
+		greenText.Print(size)
+		if config.StorageLimit != "" {
+			defaultText.Print(" / ")
+			greenText.Printf("%s\n", config.StorageLimit)
+		} else {
+			fmt.Printf("\n")
+		}
+	}
+
+	warningText.Printf("\nPlease restart the server if you make changes on config.yml!\n\n")
 
 	if err := app.Listen(PORT); err != nil {
 		log.Fatalf("Server error: %v", err)

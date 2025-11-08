@@ -8,6 +8,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database"
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 )
 
 func InitializeDatabase() {
@@ -36,14 +37,14 @@ func InitializeDatabase() {
 		database.CreateUsersTable()
 		database.CreateLogsTable()
 		database.CreateRecoveryTable()
-		err = users.CreateUser(&utils.Config.AdminAccount)
+		err = users.CreateUser(&config.Config.AdminAccount)
 
 		if err != nil {
 			fmt.Println("Error creating Admin account.")
 		}
 	}
 
-	users.UpdateAdmin(&utils.Config.AdminAccount)
+	users.UpdateAdmin(&config.Config.AdminAccount)
 
 	fmt.Println("Database connection established successfully!")
 }

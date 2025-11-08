@@ -6,13 +6,14 @@ import (
 
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
 
 func HandleUnzip(c *websocket.Conn, mt int, message types.EditorChange) {
-	src := utils.Config.Folder + message.Path
-	dest := fmt.Sprintf("%s%s/%s", utils.Config.Folder, utils.GetParentPath(message.Path), utils.GetPureFileName(message.Path))
+	src := config.Config.Folder + message.Path
+	dest := fmt.Sprintf("%s%s/%s", config.Config.Folder, utils.GetParentPath(message.Path), utils.GetPureFileName(message.Path))
 
 	for index := 1; utils.IsExistingPath(dest); index++ {
 		dest = fmt.Sprintf("%s (%d)", dest, index)

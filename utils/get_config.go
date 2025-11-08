@@ -5,11 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/MertJSX/folder-host-go/types"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"gopkg.in/yaml.v3"
 )
-
-var Config types.ConfigFile
 
 func GetConfig() {
 	fileData, err := os.ReadFile("./config.yml")
@@ -18,12 +16,12 @@ func GetConfig() {
 		log.Fatalf("Error reading config file: %s", err)
 	}
 
-	err = yaml.Unmarshal(fileData, &Config)
+	err = yaml.Unmarshal(fileData, &config.Config)
 	if err != nil {
 		log.Fatalf("Config.yml parse error: %v", err)
 	}
 
-	Config.SizeBytes = ConvertStringToBytes(Config.StorageLimit)
+	config.Config.SizeBytes = ConvertStringToBytes(config.Config.StorageLimit)
 
-	Config.Folder = strings.TrimPrefix(Config.Folder, "./")
+	config.Config.Folder = strings.TrimPrefix(config.Config.Folder, "./")
 }

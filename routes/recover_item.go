@@ -9,6 +9,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -42,7 +43,7 @@ func RecoverItem(c *fiber.Ctx) error {
 		})
 	}
 
-	if utils.Config.StorageLimit != "UNLIMITED" {
+	if config.Config.StorageLimit != "UNLIMITED" {
 		remainingFreeSpace, err := utils.GetRemainingFolderSpace()
 
 		if err != nil {

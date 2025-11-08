@@ -12,6 +12,7 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -51,7 +52,7 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 			return nil
 		}
 
-		path := utils.Config.Folder + "/" + message.Path
+		path := config.Config.Folder + "/" + message.Path
 
 		if !utils.IsSafePath(path) {
 			c.Close()

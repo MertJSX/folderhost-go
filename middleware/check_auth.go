@@ -6,6 +6,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/users"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -62,7 +63,7 @@ func CheckAuth(c *fiber.Ctx) error {
 	}
 
 	if token != "" {
-		username, err = utils.VerifyToken(token, utils.Config.SecretJwtKey)
+		username, err = utils.VerifyToken(token, config.Config.SecretJwtKey)
 		if err != nil {
 			return c.Status(401).JSON(fiber.Map{"err": "invalid token"})
 		}

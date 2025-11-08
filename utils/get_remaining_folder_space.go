@@ -1,9 +1,13 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/MertJSX/folder-host-go/utils/config"
+)
 
 func GetRemainingFolderSpace() (int64, error) {
-	mainFolderSize, _, err := GetDirectorySize(Config.Folder)
+	mainFolderSize, _, err := GetDirectorySize(config.Config.Folder)
 
 	if err != nil {
 		return 0, err
@@ -14,5 +18,5 @@ func GetRemainingFolderSpace() (int64, error) {
 
 	fmt.Printf("Editor usage: %d KB\n", editorUsage/1024)
 
-	return Config.SizeBytes - (mainFolderSize + editorUsage), nil
+	return config.Config.SizeBytes - (mainFolderSize + editorUsage), nil
 }

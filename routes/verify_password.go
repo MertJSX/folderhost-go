@@ -6,11 +6,12 @@ import (
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
 func VerifyPassword(c *fiber.Ctx) error {
-	token, err := utils.CreateToken(c.Locals("account").(types.Account).Username, utils.Config.SecretJwtKey)
+	token, err := utils.CreateToken(c.Locals("account").(types.Account).Username, config.Config.SecretJwtKey)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "unknown error while getting token"})

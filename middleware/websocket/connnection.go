@@ -9,6 +9,7 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,7 +23,7 @@ func HandleWebsocket(c *websocket.Conn) {
 		return
 	}
 
-	config := &utils.Config
+	config := &config.Config
 	path = config.Folder + path
 
 	if !utils.IsSafePath(path) {

@@ -11,6 +11,7 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
 	"github.com/MertJSX/folder-host-go/utils/cache"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -28,7 +29,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		mode = "Optimized mode"
 	}
 
-	config := &utils.Config
+	config := &config.Config
 	var dirPath string = fmt.Sprintf("%s%s", config.Folder, path)
 	directoryData, err := os.Stat(dirPath)
 	var pathCacheName string = dirPath

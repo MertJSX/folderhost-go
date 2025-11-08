@@ -5,15 +5,17 @@ import (
 	"time"
 
 	"github.com/MertJSX/folder-host-go/database/logs"
-	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 )
 
 func AutoClearOldLogs() {
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
 
-	if utils.Config.ClearLogsAfter > 0 {
-		err := logs.ClearOldLogs(utils.Config.ClearLogsAfter)
+	config := &config.Config
+
+	if config.ClearLogsAfter > 0 {
+		err := logs.ClearOldLogs(config.ClearLogsAfter)
 		if err != nil {
 			fmt.Printf("Error while clearing old logs: %s\n", err)
 		}
@@ -22,8 +24,8 @@ func AutoClearOldLogs() {
 	}
 
 	for range ticker.C {
-		if utils.Config.ClearLogsAfter > 0 {
-			err := logs.ClearOldLogs(utils.Config.ClearLogsAfter)
+		if config.ClearLogsAfter > 0 {
+			err := logs.ClearOldLogs(config.ClearLogsAfter)
 			if err != nil {
 				fmt.Printf("Error while clearing old logs: %s\n", err)
 			}

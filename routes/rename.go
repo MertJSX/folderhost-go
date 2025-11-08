@@ -8,11 +8,12 @@ import (
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Rename(c *fiber.Ctx) error {
-	config := &utils.Config
+	config := &config.Config
 	oldFilepath := c.Query("oldFilepath")
 	var filename string
 	newFilepath := c.Query("newFilepath")
