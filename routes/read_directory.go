@@ -117,7 +117,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		StorageInfo:   mode == "Quality mode",
 	}, 600*time.Second)
 
-	fmt.Printf("Execute time (Uncached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
+	// fmt.Printf("Execute time (Uncached): %s\n", time.Since(c.Locals("startTime").(time.Time)))
 	return c.JSON(
 		fiber.Map{
 			"items":         data,

@@ -52,7 +52,6 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 		}
 	}
 
-	fmt.Println("Completed successfully!")
 	cb(totalSize, true, "")
 
 	return nil
