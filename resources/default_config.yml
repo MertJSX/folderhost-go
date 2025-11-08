@@ -1,3 +1,14 @@
+#      _______   __   __
+#     / _____/  / /  / /
+#    / /__     / /__/ /
+#   / ___/    / ___  /
+#  / /       / /  / /
+# /_/       /_/  /_/  By MertJSX
+#
+# Thanks for using my application!!! Please report if you catch any bugs!
+# Here is the GitHub page of Folderhost: https://github.com/MertJSX/folderhost-go
+#
+
 # Port is required. Don't delete it!
 port: 5000
 
@@ -6,7 +17,7 @@ folder: "./testdir"
 
 # Limit of the folder. Examples: 10 GB, 300 MB, 5.5 GB, 1 TB...
 # You can remove it if you trust users.
-storage_limit: "20 GB"
+storage_limit: "10 GB"
 
 # This is secret json web token key to create tokens.
 secret_jwt_key: "you must change it" # Example: 5asdasd1asd
@@ -35,10 +46,10 @@ admin:
     read_logs: true
 
 # Holds deleted files. Accidentally, you might delete files that you don't want to delete.
-recovery_bin: false
+recovery_bin: true
 
 # Optionally you can limit recovery_bin storage. You can remove it if you want.
-bin_storage_limit: "10 GB"
+bin_storage_limit: "5 GB"
 
 # Enable/Disable logging activities
 log_activities: true
