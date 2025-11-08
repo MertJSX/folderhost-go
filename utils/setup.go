@@ -19,7 +19,11 @@ func Setup() {
 		}
 	} else {
 		os.RemoveAll("tmp")
-		os.Mkdir("tmp", 0700)
+		err := os.Mkdir("tmp", 0700)
+
+		if err != nil {
+			log.Fatalf("Error creating tmp folder!")
+		}
 	}
 
 	if IsNotExistingPath("./config.yml") {
