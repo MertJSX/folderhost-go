@@ -8,9 +8,6 @@ folder: "./testdir"
 # You can remove it if you trust users.
 storage_limit: "20 GB"
 
-# This is secret encryption key to create encrypted tokens.
-secret_encryption_key: "you must change it" # Example: 5asdasd1asd
-
 # This is secret json web token key to create tokens.
 secret_jwt_key: "you must change it" # Example: 5asdasd1asd
 
