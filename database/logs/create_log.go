@@ -6,9 +6,13 @@ import (
 
 	"github.com/MertJSX/folder-host-go/database"
 	"github.com/MertJSX/folder-host-go/types"
+	"github.com/MertJSX/folder-host-go/utils/config"
 )
 
 func CreateLog(logItem types.AuditLog) error {
+	if !config.Config.LogActivities {
+		return nil
+	}
 	tx, err := database.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
