@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"runtime"
 
 	"github.com/MertJSX/folder-host-go/database/initialize"
 	"github.com/MertJSX/folder-host-go/middleware"
@@ -215,6 +216,8 @@ func main() {
 	defaultText.Printf("\nThe server has started on port %d!\n", portInt)
 	defaultText.Print("URL: ")
 	warningText.Printf("http://127.0.0.1:%d\n", portInt)
+	defaultText.Print("Operating system: ")
+	warningText.Printf("%s\n", runtime.GOOS)
 
 	if config.GetFoldersizeOnStart {
 		_, size, err := utils.GetDirectorySize(config.Folder)
