@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"syscall"
 )
 
 func CopyDirectory(srcDir, dest string) error {
@@ -27,11 +26,6 @@ func CopyDirectory(srcDir, dest string) error {
 			return err
 		}
 
-		stat, ok := fileInfo.Sys().(*syscall.Stat_t)
-		if !ok {
-			return fmt.Errorf("failed to get raw syscall.Stat_t data for '%s'", sourcePath)
-		}
-
 		switch fileInfo.Mode() & os.ModeType {
 		case os.ModeDir:
 			if err := CopyDirectory(sourcePath, destPath); err != nil {
@@ -47,20 +41,8 @@ func CopyDirectory(srcDir, dest string) error {
 			}
 		}
 
-		if err := os.Lchown(destPath, int(stat.Uid), int(stat.Gid)); err != nil {
+		if err := os.Chmod(destPath, fileInfo.Mode()); err != nil {
 			return err
-		}
-
-		fInfo, err := entry.Info()
-		if err != nil {
-			return err
-		}
-
-		isSymlink := fInfo.Mode()&os.ModeSymlink != 0
-		if !isSymlink {
-			if err := os.Chmod(destPath, fInfo.Mode()); err != nil {
-				return err
-			}
 		}
 	}
 	return nil
@@ -71,14 +53,12 @@ func CopyFile(srcFile, dstFile string) error {
 	if err != nil {
 		return err
 	}
-
 	defer out.Close()
 
 	in, err := os.Open(srcFile)
 	if err != nil {
 		return err
 	}
-
 	defer in.Close()
 
 	_, err = io.Copy(out, in)
