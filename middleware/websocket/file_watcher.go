@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -33,7 +32,6 @@ func SetupWatcher(path string, stopChan chan bool) {
 		return
 	}
 	defer watcher.Close()
-	defer fmt.Println("Stopped watching...")
 	defer close(stopChan)
 
 	err = watcher.Add(path)
@@ -41,8 +39,6 @@ func SetupWatcher(path string, stopChan chan bool) {
 		log.Println("Watcher add error:", err)
 		return
 	}
-
-	log.Printf("👀 Watching %s file...\n", path)
 
 	// On file changed by the host computer
 	for {
@@ -63,7 +59,7 @@ func SetupWatcher(path string, stopChan chan bool) {
 			}
 
 		case <-stopChan:
-			fmt.Printf("🛑 Watcher received stop signal: %s\n", path)
+			// Watcher received stop signal
 			return
 		}
 	}
