@@ -23,6 +23,11 @@ var EditorWatcherCache *Cache[string, types.EditorWatcherCache] = CreateCache[st
 	TimeoutCacheEvent: false,
 })
 
+var DownloadLinkCache *Cache[string, types.DownloadLinkCache] = CreateCache[string, types.DownloadLinkCache](1*time.Minute, CacheProperties{
+	SetCacheEvent:     false,
+	TimeoutCacheEvent: false,
+})
+
 func ListenDirectorySetCacheEvents() {
 	msg, _ := json.Marshal(fiber.Map{
 		"type": "directory-update",

@@ -79,6 +79,10 @@ func main() {
 		fhWS.HandleWebsocket(c)
 	}))
 
+	app.Get("/download", func(c *fiber.Ctx) error {
+		return routes.Download(c)
+	})
+
 	app.Use("/api", func(c *fiber.Ctx) error {
 		return middleware.CheckAuth(c)
 	})
@@ -105,8 +109,8 @@ func main() {
 		return routes.ReadDirectory(c)
 	})
 
-	app.Get("/api/explorer/download", func(c *fiber.Ctx) error {
-		return routes.Download(c)
+	app.Get("/api/explorer/get-download-link", func(c *fiber.Ctx) error {
+		return routes.GetDownloadLink(c)
 	})
 
 	app.Post("/api/upload", func(c *fiber.Ctx) error {
