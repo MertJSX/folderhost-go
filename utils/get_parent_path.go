@@ -3,6 +3,7 @@ package utils
 import "strings"
 
 func GetParentPath(DirectoryItemPath string) string {
+	DirectoryItemPath = strings.ReplaceAll(DirectoryItemPath, "\\", "/")
 	lastIndex := strings.LastIndex(DirectoryItemPath, "/")
 
 	if lastIndex == -1 {

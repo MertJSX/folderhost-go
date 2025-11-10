@@ -6,6 +6,7 @@ import (
 )
 
 func GetPureFileName(path string) string {
+	path = strings.ReplaceAll(path, "\\", "/")
 	fileName := filepath.Base(path)
 
 	firstDot := strings.Index(fileName, ".")
