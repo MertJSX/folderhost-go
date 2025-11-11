@@ -1,23 +1,23 @@
 services:
   folderhost:
-    container_name: folderhost-go
+    container_name: folderhost-server
     build: .
     ports:
       - "5000:5000"
     volumes:
-      - ./database.db:/folderhost-go/database.db:z
-      - ./recovery_bin:/folderhost-go/recovery_bin:z
-      - ./testdir:/folderhost-go/testdir:z
-      - ./config.yml:/folderhost-go/config.yml:z
+      - ./database.db:/folderhost-server/database.db:z
+      - ./recovery_bin:/folderhost-server/recovery_bin:z
+      - ./testdir:/folderhost-server/testdir:z
+      - ./config.yml:/folderhost-server/config.yml:z
     restart: unless-stopped
   folderhost-client: # Service name
-    container_name: folderhost-client-v2
+    container_name: folderhost-client
     build: 
-      context: ./client # Dockerfile path
+      context: ./web # Dockerfile path
     ports:
       - "5173:5173"
     volumes:
-      - ./client/src:/folderhost-client/src:z
-      - ./client/index.html:/folderhost-client/index.html:z
-      - ./client/public:/folderhost-client/public:z
+      - ./web/src:/folderhost-client/src:z
+      - ./web/index.html:/folderhost-client/index.html:z
+      - ./web/public:/folderhost-client/public:z
     restart: unless-stopped
