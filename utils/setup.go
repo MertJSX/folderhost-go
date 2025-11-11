@@ -39,6 +39,11 @@ func Setup() {
 		if err != nil {
 			log.Fatalf("Error creating config.yml")
 		}
+
+		if IsNotExistingPath("host") {
+			fmt.Println("Creating host directory...")
+			os.Mkdir("host", 0700)
+		}
 	}
 
 	if IsNotExistingPath("recovery_bin") && config.Config.RecoveryBin {

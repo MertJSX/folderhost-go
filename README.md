@@ -57,7 +57,7 @@
 port: 5000
 
 # This is folder path. You can change it, but don't delete.
-folder: "./testdir"
+folder: "./host"
 
 # Limit of the folder. Examples: 10 GB, 300 MB, 5.5 GB, 1 TB...
 # You can remove it if you trust users.
