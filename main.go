@@ -174,7 +174,7 @@ func main() {
 	})
 
 	if !utils.IsDevelopment() {
-		distFS, err := fs.Sub(FrontendFS, "client/dist")
+		distFS, err := fs.Sub(FrontendFS, "web/dist")
 		if err != nil {
 			log.Fatal("Error creating sub FS:", err)
 		}
@@ -223,20 +223,18 @@ func main() {
 	defaultText.Print("Operating system: ")
 	warningText.Printf("%s\n", runtime.GOOS)
 
-	if config.GetFoldersizeOnStart {
-		_, size, err := utils.GetDirectorySize(config.Folder)
-		if err != nil {
-			errorText.Printf("\nError while getting foldersize:\n %v\n", err)
-			return
-		}
-		defaultText.Print("Folder size: ")
-		greenText.Print(size)
-		if config.StorageLimit != "" {
-			defaultText.Print(" / ")
-			greenText.Printf("%s\n", config.StorageLimit)
-		} else {
-			fmt.Printf("\n")
-		}
+	_, size, err := utils.GetDirectorySize(config.Folder)
+	if err != nil {
+		errorText.Printf("\nError while getting foldersize:\n %v\n", err)
+		return
+	}
+	defaultText.Print("Folder size: ")
+	greenText.Print(size)
+	if config.StorageLimit != "" {
+		defaultText.Print(" / ")
+		greenText.Printf("%s\n", config.StorageLimit)
+	} else {
+		fmt.Printf("\n")
 	}
 
 	warningText.Printf("\nPlease restart the server if you make changes on config.yml!\n\n")
