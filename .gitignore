@@ -3,6 +3,7 @@
 /tmp
 /recovery_bin
 database.db
+/debug
 
 # Logs
 web/logs
