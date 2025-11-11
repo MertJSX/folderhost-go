@@ -19,23 +19,23 @@ export const jsSnippets = (monaco: Monaco) => {
         {
             label: 'for',
             kind: monaco.languages.CompletionItemKind.Snippet,
-            insertText: `for(int i = 0;i < \${1:item}.length;i++) {\n\t$0\n}`,
+            insertText: `for(let i = 0;i < \${1:item}.length;i++) {\n\t$0\n}`,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            documentation: 'Creates a while loop'
+            documentation: 'Creates a for loop'
         },
         {
             label: 'if',
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: `if (\${1:condition}) {\n\t$0\n}`,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            documentation: 'Creates a new function'
+            documentation: 'Creates an if statement'
         },
         {
             label: 'switch',
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: `switch (\${1:key}) {\n\tcase value:\n\t\t\n\t\tbreak;\n\tdefault:\n\t\tbreak;\n}`,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            documentation: 'Creates a new switch statement'
+            documentation: 'Creates a new switch case'
         },
         {
             label: 'log',

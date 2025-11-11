@@ -1,4 +1,6 @@
-export const yamlSnippets = (monaco) => {
+import type { Monaco } from "@monaco-editor/react";
+
+export const yamlSnippets = (monaco: Monaco) => {
     return [
         {
             label: 'true',

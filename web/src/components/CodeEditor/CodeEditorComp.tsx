@@ -47,7 +47,6 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
   messages,
   isConnectedRef,
   setRes,
-  setFileContent,
   setReadOnly
 }) => {
   const [editorFontSize, setEditorFontSize] = useState<number>(parseInt(Cookies.get("editor-fontsize") ?? "18", 10) || 18);
@@ -64,17 +63,13 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
 
     monacoInstance.languages.registerCompletionItemProvider('html', {
       provideCompletionItems: (model: editor.ITextModel, position: Position) => {
-        let suggestions = htmlSnippets(monacoInstance).map(snippet => ({
-          ...snippet,
-          range,
-        }));
         const textBeforePosition = model.getValueInRange({
           startLineNumber: 1,
           startColumn: 1,
           endLineNumber: position.lineNumber,
           endColumn: position.column,
         });
-
+        
         const word = model.getWordUntilPosition(position);
         const range = {
           startLineNumber: position.lineNumber,
@@ -82,23 +77,28 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
           startColumn: word.startColumn,
           endColumn: word.endColumn,
         };
-
+        
         const scriptOpen = /<script[^>]*>/gi;
         const scriptClose = /<\/script>/gi;
-
+        
         let match;
         let lastOpenIndex = -1;
         let lastCloseIndex = -1;
-
-        while ((match = scriptOpen.exec(textBeforePosition))) {
+        
+        while (match = scriptOpen.exec(textBeforePosition)) {
           lastOpenIndex = match.index;
         }
-
-        while ((match = scriptClose.exec(textBeforePosition))) {
+        
+        while (match = scriptClose.exec(textBeforePosition)) {
           lastCloseIndex = match.index;
         }
-
+        
         const inScriptTag = lastOpenIndex > lastCloseIndex;
+        
+        let suggestions = htmlSnippets(monacoInstance).map(snippet => ({
+          ...snippet,
+          range,
+        }));
 
         if (inScriptTag) {
           const suggestions = jsSnippets(monacoInstance).map(snippet => ({
@@ -107,7 +107,7 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
           }));
           return { suggestions: suggestions };
         }
-
+        
         return { suggestions: suggestions };
       }
     });
