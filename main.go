@@ -26,7 +26,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
-//go:embed client/dist/*
+//go:embed web/dist/*
 var FrontendFS embed.FS
 
 func main() {

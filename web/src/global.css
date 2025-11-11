@@ -1,0 +1,51 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body {
+  background-color: #111827;
+}
+
+* {
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  outline: none;
+}
+
+::selection {
+  background-color: cornflowerblue;
+  --tw-text-opacity: 1;
+  color: rgb(0, 0, 0);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0ea5e9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0c94d3;
+}
+
+@keyframes spin-once {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin-once {
+    animation: spin-once 0.5s ease-in-out;
+}

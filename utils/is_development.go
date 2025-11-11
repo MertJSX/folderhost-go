@@ -6,7 +6,7 @@ import (
 )
 
 func IsDevelopment() bool {
-	if _, err := os.Stat("client/dist"); err == nil {
+	if _, err := os.Stat("web/dist"); err == nil {
 		return false // that's for testing client build on server
 	}
 
@@ -14,7 +14,7 @@ func IsDevelopment() bool {
 		return true
 	}
 
-	if _, err := os.Stat("client/src"); err == nil {
+	if _, err := os.Stat("web/src"); err == nil {
 		return true
 	}
 

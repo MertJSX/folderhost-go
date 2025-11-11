@@ -7,6 +7,8 @@ testdir/
 .dockerignore
 Dockerfile
 docker-compose.yml
-client/*
-!client/dist
-!client/dist/**
+web/node_modules
+web/dist
+web/*
+!web/dist
+!web/dist/**

@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    // Environment Settings
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "module": "ESNext",
+    "target": "ES2020",
+    "jsx": "react-jsx",
+    
+    // Module Resolution
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    
+    "noEmit": true,
+    "isolatedModules": true,
+    
+    // Type Checking
+    "strict": true,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    
+    // Vite compatibility
+    "types": ["vite/client"],
+    "verbatimModuleSyntax": true,
+    
+    // Development quality of life
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
