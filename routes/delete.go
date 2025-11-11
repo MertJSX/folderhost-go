@@ -2,6 +2,7 @@ package routes
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -65,6 +66,7 @@ func Delete(c *fiber.Ctx) error {
 		if err == nil {
 			return c.Status(200).JSON(fiber.Map{"response": "Item was deleted successfully!"})
 		} else {
+			log.Printf("Error: %v\n", err)
 			return c.Status(500).JSON(fiber.Map{"err": "Unknown error!"})
 		}
 	}
@@ -90,6 +92,7 @@ func Delete(c *fiber.Ctx) error {
 	if itemToBeDeletedStat.IsDir() {
 		sizeOfItem, _, err = utils.GetDirectorySize(path)
 		if err != nil {
+			log.Printf("Error: %v\n", err)
 			return c.Status(500).JSON(fiber.Map{"err": "Unknown server error"})
 		}
 	}
@@ -98,6 +101,7 @@ func Delete(c *fiber.Ctx) error {
 		sizeOfRecoveryBin, _, err := utils.GetDirectorySize("./recovery_bin")
 
 		if err != nil {
+			log.Printf("Error: %v\n", err)
 			return c.Status(500).JSON(fiber.Map{"err": "Unknown server error"})
 		}
 
