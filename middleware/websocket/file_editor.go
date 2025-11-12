@@ -3,7 +3,6 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"unicode/utf8"
@@ -58,8 +57,6 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 			c.Close()
 			return fmt.Errorf("path traversal security issue")
 		}
-
-		log.Printf("Change path: %s\n", path)
 
 		fileStat, err := os.Stat(path)
 		if err != nil {
