@@ -1,0 +1,60 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (v1.0.0 for example)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Release notes'
+        required: false
+        type: string
+        default: 'Automatic build release'
+
+env:
+  BINARY_NAME: folderhost
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        make setup
+
+    - name: Build for Linux and Windows
+      run: |
+        make build
+
+    - name: List built files
+      run: ls -la ./debug/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        name: Release ${{ github.event.inputs.version }}
+        body: ${{ github.event.inputs.release_notes }}
+        files: |
+          ./debug/${{ env.BINARY_NAME }}
+          ./debug/${{ env.BINARY_NAME }}.exe
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
