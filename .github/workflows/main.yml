@@ -36,8 +36,8 @@ jobs:
         echo "Month: $(date +'%m')"
         echo "Day: $(date +'%d')"
         
-        CURRENT_YEAR=$(date +'%y')  # 25
-        CURRENT_MONTH=$(date +'%m') # 11
+        CURRENT_YEAR=$(date +'%y')
+        CURRENT_MONTH=$(date +'%m')
         
         echo "Using Year: $CURRENT_YEAR, Month: $CURRENT_MONTH"
         
@@ -53,7 +53,7 @@ jobs:
           fi
           
         elif [[ "${{ github.event.inputs.release_type }}" == "major" ]]; then
-          VERSION="v$CURRENT_YEAR.$((CURRENT_MONTH + 1)).0"
+          VERSION="v$CURRENT_YEAR.$((CURRENT_MONTH)).0"
           
         elif [[ "${{ github.event.inputs.release_type }}" == "minor" ]]; then
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v$CURRENT_YEAR.$CURRENT_MONTH.0")
