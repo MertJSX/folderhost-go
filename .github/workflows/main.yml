@@ -3,15 +3,18 @@ name: Create Release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version (v1.0.0 for example)'
+      release_type:
+        description: 'Release type'
         required: true
-        type: string
-      release_notes:
-        description: 'Release notes'
+        type: choice
+        options:
+        - major    # v25.1.0 → v25.2.0
+        - minor    # v25.1.0 → v25.1.1
+        - auto
+      custom_version:
+        description: 'Custom version (optional)'
         required: false
         type: string
-        default: 'Automatic build release'
 
 env:
   BINARY_NAME: folderhost
@@ -23,6 +26,39 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Calculate automatic version
+      id: version
+      run: |
+        CURRENT_YEAR=$(date +'%y')
+        CURRENT_MONTH=$(date +'%m')
+        CURRENT_DAY=$(date +'%d')
+        
+        if [[ "${{ github.event.inputs.release_type }}" == "auto" ]]; then
+          LATEST_TAG=$(git tag -l "v$CURRENT_YEAR.$CURRENT_MONTH.*" --sort=-v:refname | head -n 1)
+          
+          if [ -z "$LATEST_TAG" ]; then
+            VERSION="v$CURRENT_YEAR.$CURRENT_MONTH.0"
+          else
+            LAST_PATCH=$(echo $LATEST_TAG | awk -F. '{print $3}')
+            NEW_PATCH=$((LAST_PATCH + 1))
+            VERSION="v$CURRENT_YEAR.$CURRENT_MONTH.$NEW_PATCH"
+          fi
+          
+        elif [[ "${{ github.event.inputs.release_type }}" == "major" ]]; then
+          VERSION="v$CURRENT_YEAR.$((CURRENT_MONTH + 1)).0"
+          
+        elif [[ "${{ github.event.inputs.release_type }}" == "minor" ]]; then
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v$CURRENT_YEAR.$CURRENT_MONTH.0")
+          LAST_PATCH=$(echo $LATEST_TAG | awk -F. '{print $3}')
+          VERSION="v$CURRENT_YEAR.$CURRENT_MONTH.$((LAST_PATCH + 1))"
+          
+        else
+          VERSION="${{ github.event.inputs.custom_version }}"
+        fi
+
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "🎯 Calculated version: $VERSION"
 
     - name: Setup Go
       uses: actions/setup-go@v4
@@ -42,15 +78,17 @@ jobs:
       run: |
         make build
 
-    - name: List built files
-      run: ls -la ./debug/
-
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.event.inputs.version }}
-        name: Release ${{ github.event.inputs.version }}
-        body: ${{ github.event.inputs.release_notes }}
+        tag_name: ${{ steps.version.outputs.version }}
+        name: Release ${{ steps.version.outputs.version }}
+        body: |
+          🚀 Automatic Build Release
+          Version: ${{ steps.version.outputs.version }}
+          Date: $(date +'%Y-%m-%d %H:%M:%S')
+          
+          ${{ github.event.inputs.custom_version && format('Custom notes: {0}', github.event.inputs.custom_version) || '' }}
         files: |
           ./debug/${{ env.BINARY_NAME }}
           ./debug/${{ env.BINARY_NAME }}.exe
