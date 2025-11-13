@@ -60,6 +60,10 @@ jobs:
         echo "version=$VERSION" >> $GITHUB_OUTPUT
         echo "🎯 Calculated version: $VERSION"
 
+    - name: Get current date
+      id: date
+      run: echo "current_date=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+
     - name: Setup Go
       uses: actions/setup-go@v4
       with:
@@ -83,8 +87,24 @@ jobs:
       run: |
         make build
 
-    - name: List built files
-      run: ls -la ./debug/
+    - name: Create Linux package
+      run: |
+        mkdir -p ./release_packages
+        cp ./debug/${{ env.BINARY_NAME }} ./${{ env.BINARY_NAME }}
+        chmod +x ./${{ env.BINARY_NAME }}
+        zip -j ./release_packages/folderhost-linux-amd64.zip ./${{ env.BINARY_NAME }}
+        rm ./${{ env.BINARY_NAME }}
+        echo "📦 Linux package created"
+
+    - name: Create Windows package
+      run: |
+        cp ./debug/${{ env.BINARY_NAME }}.exe ./${{ env.BINARY_NAME }}.exe
+        zip -j ./release_packages/folderhost-windows-amd64.zip ./${{ env.BINARY_NAME }}.exe
+        rm ./${{ env.BINARY_NAME }}.exe
+        echo "📦 Windows package created"
+
+    - name: List release packages
+      run: ls -la ./release_packages/
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
@@ -94,12 +114,24 @@ jobs:
         body: |
           🚀 Automatic Build Release
           Version: ${{ steps.version.outputs.version }}
-          Date: $(date +'%Y-%m-%d %H:%M:%S')
+          Date: ${{ steps.date.outputs.current_date }}
           
-          ${{ github.event.inputs.custom_version && format('Custom notes: {0}', github.event.inputs.custom_version) || '' }}
+          ## 📦 Download Packages
+          
+          - **Linux**: [folderhost-linux-amd64.zip](folderhost-linux-amd64.zip) - Linux x86_64 binary
+          - **Windows**: [folderhost-windows-amd64.zip](folderhost-windows-amd64.zip) - Windows x86_64 executable
+          
+          ## 🔧 Installation
+          
+          1. Download the zip file for your operating system
+          2. Extract the binary
+          3. Place the binary into folder
+          4. Run the application
+          5. Configure the config.yml file
+          6. Restart the application
         files: |
-          ./debug/${{ env.BINARY_NAME }}
-          ./debug/${{ env.BINARY_NAME }}.exe
+          ./release_packages/folderhost-linux-amd64.zip
+          ./release_packages/folderhost-windows-amd64.zip
         draft: false
         prerelease: false
       env:
