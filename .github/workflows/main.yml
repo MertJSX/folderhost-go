@@ -70,6 +70,11 @@ jobs:
       with:
         node-version: '18'
 
+    - name: Install Mingw for Windows cross-compilation
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-mingw-w64
+
     - name: Install dependencies
       run: |
         make setup
@@ -77,6 +82,9 @@ jobs:
     - name: Build for Linux and Windows
       run: |
         make build
+
+    - name: List built files
+      run: ls -la ./debug/
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
