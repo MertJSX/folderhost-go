@@ -30,9 +30,16 @@ jobs:
     - name: Calculate automatic version
       id: version
       run: |
-        CURRENT_YEAR=$(date +'%y')
-        CURRENT_MONTH=$(date +'%m')
-        CURRENT_DAY=$(date +'%d')
+        echo "Full date: $(date)"
+        echo "Year (full): $(date +'%Y')"
+        echo "Year (short): $(date +'%y')" 
+        echo "Month: $(date +'%m')"
+        echo "Day: $(date +'%d')"
+        
+        CURRENT_YEAR=$(date +'%y')  # 25
+        CURRENT_MONTH=$(date +'%m') # 11
+        
+        echo "Using Year: $CURRENT_YEAR, Month: $CURRENT_MONTH"
         
         if [[ "${{ github.event.inputs.release_type }}" == "auto" ]]; then
           LATEST_TAG=$(git tag -l "v$CURRENT_YEAR.$CURRENT_MONTH.*" --sort=-v:refname | head -n 1)
