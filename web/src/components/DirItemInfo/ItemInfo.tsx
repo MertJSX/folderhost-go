@@ -1,21 +1,11 @@
-import { useRef, useContext } from 'react'
+import { useRef, useContext, useState, useLayoutEffect } from 'react'
 import moment from 'moment'
-import { FaFolder } from "react-icons/fa";
-import { FaFileAlt } from "react-icons/fa";
-import { FaFileImage } from "react-icons/fa";
-import { FaFilePdf } from "react-icons/fa6";
-import { FaFileArchive } from "react-icons/fa";
-import { FaHtml5 } from "react-icons/fa";
-import { FaCss3 } from "react-icons/fa";
-import { IoLogoJavascript } from "react-icons/io";
-import { FaFolderOpen } from "react-icons/fa6";
-import { FaJava } from "react-icons/fa";
-import { FaMusic } from "react-icons/fa";
-import { BiMoviePlay } from "react-icons/bi";
 import Cookies from 'js-cookie';
 import ExplorerContext from '../../utils/ExplorerContext';
 import { type ExplorerContextType } from '../../types/ExplorerContextType';
 import { DirectoryItemIcon } from '../../utils/DirectoryItemIcon';
+import axiosInstance from '../../utils/axiosInstance';
+import { isImageItem } from '../../utils/isImageItem';
 
 const ItemInfo = () => {
   const renameInput = useRef<HTMLInputElement>(null)
@@ -23,11 +13,85 @@ const ItemInfo = () => {
   const {
     itemInfo, setItemInfo, renameItem, downloadFile, downloadProgress, deleteItem, createCopy, path, createItem, unzipProgress, permissions, showDisabled, startUnzipping, directoryInfo
   } = useContext<ExplorerContextType>(ExplorerContext)
+  
+  const [imageData, setImageData] = useState("")
+  const [imageLoading, setImageLoading] = useState(false)
+  const [imageError, setImageError] = useState(false)
+
+  const fetchImage = async () => {
+    setImageLoading(true)
+    setImageError(false)
+    
+    try {
+      let imgPath = itemInfo?.path;
+
+      if (imgPath == undefined) {
+        return
+      }
+
+      if (imgPath[0] == ".") {
+        imgPath = imgPath.slice(1);
+      }
+
+      imgPath = encodeURIComponent(imgPath)
+      const response = await axiosInstance.get(`/image/${imgPath}`, {
+        responseType: 'blob'
+      })
+
+      const blob = response.data;
+      
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(blob);
+      });
+
+      setImageData(base64Data as string);
+      
+    } catch (error) {
+      setImageError(true)
+    } finally {
+      setImageLoading(false)
+    }
+  };
+
+  useLayoutEffect(() => {
+    if (isImageItem(itemInfo)) {
+      fetchImage()
+    } else {
+      setImageData("")
+      setImageError(false)
+    }
+  }, [itemInfo])
 
   return (
     <div className='flex flex-col items-center justify-center w-1/3 mx-auto min-w-[320px] max-w-[30%] min-h-[600px] h-[700px] max-h-[800px]'>
       <div className='flex flex-col bg-gray-800 items-center justify-center gap-3 rounded-xl shadow-2xl w-full h-auto p-4 min-h-[400px]'>
-        { itemInfo ? <DirectoryItemIcon itemInfo={itemInfo} logoSize={logoSize} /> : null}
+        {
+          isImageItem(itemInfo) && !imageError ? (
+            <div className="relative">
+              {imageLoading && (
+                <div className="w-[300px] h-[200px] flex items-center justify-center bg-gray-800 rounded">
+                  <span className="text-gray-400">Loading...</span>
+                </div>
+              )}
+              
+              {!imageLoading && !imageError && imageData && (
+                <img 
+                  src={imageData}
+                  alt={itemInfo?.name || ''} 
+                  width={300} 
+                  onError={() => setImageError(true)}
+                  className="max-w-[200px] max-h-[200px] object-contain"
+                />
+              )}
+            </div>
+          ) : itemInfo ? (
+            <DirectoryItemIcon itemInfo={itemInfo} logoSize={logoSize} />
+          ) : null
+        }
+
         {
           itemInfo?.path === "./" ?
             <h1
@@ -74,7 +138,6 @@ const ItemInfo = () => {
                 className='bg-transparent text-xl text-amber-300 font-bold text-wrap break-all text-center'
               />
         }
-
 
         <h1 className='text-gray-400 text-center break-all text-wrap'>
           Path: <span className="text-amber-200">{itemInfo?.path}</span>
