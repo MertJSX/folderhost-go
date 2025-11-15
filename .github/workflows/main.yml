@@ -8,11 +8,11 @@ on:
         required: true
         type: choice
         options:
-        - major    # v25.1.0 → v25.2.0
-        - minor    # v25.1.0 → v25.1.1
-        - auto
+        - auto     # Otomatik: mevcut ay için patch artırır
+        - major    # Major: yeni ay versiyonu (YY.MM.0)
+        - minor    # Minor: patch versiyonu artırır
       custom_version:
-        description: 'Custom version (optional)'
+        description: 'Custom version (optional, format: vYY.MM.PATCH)'
         required: false
         type: string
 
@@ -26,60 +26,81 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Tüm tag'leri almak için gerekli
 
-    - name: Calculate automatic version
+    - name: Calculate version
       id: version
       run: |
-        echo "Full date: $(date)"
-        echo "Year (full): $(date +'%Y')"
-        echo "Year (short): $(date +'%y')" 
-        echo "Month: $(date +'%m')"
-        echo "Day: $(date +'%d')"
-        
         CURRENT_YEAR=$(date +'%y')
         CURRENT_MONTH=$(date +'%m')
         
-        echo "Using Year: $CURRENT_YEAR, Month: $CURRENT_MONTH"
+        CURRENT_MONTH=$((10#$CURRENT_MONTH))
         
-        if [[ "${{ github.event.inputs.release_type }}" == "auto" ]]; then
-          LATEST_TAG=$(git tag -l "v$CURRENT_YEAR.$CURRENT_MONTH.*" --sort=-v:refname | head -n 1)
+        echo "📅 Current date: Year=$CURRENT_YEAR, Month=$CURRENT_MONTH"
+        
+        if [[ -n "${{ github.event.inputs.custom_version }}" ]]; then
+          VERSION="${{ github.event.inputs.custom_version }}"
+          echo "✏️ Using custom version: $VERSION"
+        
+        elif [[ "${{ github.event.inputs.release_type }}" == "auto" ]]; then
+          LATEST_TAG=$(git tag -l "v${CURRENT_YEAR}.${CURRENT_MONTH}.*" --sort=-v:refname | head -n 1)
           
           if [ -z "$LATEST_TAG" ]; then
-            VERSION="v$CURRENT_YEAR.$CURRENT_MONTH.0"
+            VERSION="v${CURRENT_YEAR}.${CURRENT_MONTH}.0"
+            echo "🆕 No existing tags for this month, starting with: $VERSION"
           else
             LAST_PATCH=$(echo $LATEST_TAG | awk -F. '{print $3}')
             NEW_PATCH=$((LAST_PATCH + 1))
-            VERSION="v$CURRENT_YEAR.$CURRENT_MONTH.$NEW_PATCH"
+            VERSION="v${CURRENT_YEAR}.${CURRENT_MONTH}.${NEW_PATCH}"
+            echo "⬆️ Incrementing from $LATEST_TAG to $VERSION"
           fi
-          
+        
         elif [[ "${{ github.event.inputs.release_type }}" == "major" ]]; then
-          VERSION="v$CURRENT_YEAR.$((CURRENT_MONTH)).0"
-          
+          # Mevcut ayda zaten bir release varsa uyar
+          EXISTING_TAG=$(git tag -l "v${CURRENT_YEAR}.${CURRENT_MONTH}.0")
+          if [ -n "$EXISTING_TAG" ]; then
+            echo "⚠️ Warning: v${CURRENT_YEAR}.${CURRENT_MONTH}.0 already exists!"
+          fi
+          VERSION="v${CURRENT_YEAR}.${CURRENT_MONTH}.0"
+          echo "🎯 Creating new major version: $VERSION"
+        
         elif [[ "${{ github.event.inputs.release_type }}" == "minor" ]]; then
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v$CURRENT_YEAR.$CURRENT_MONTH.0")
-          LAST_PATCH=$(echo $LATEST_TAG | awk -F. '{print $3}')
-          VERSION="v$CURRENT_YEAR.$CURRENT_MONTH.$((LAST_PATCH + 1))"
+          LATEST_TAG=$(git tag -l "v${CURRENT_YEAR}.${CURRENT_MONTH}.*" --sort=-v:refname | head -n 1)
           
-        else
-          VERSION="${{ github.event.inputs.custom_version }}"
+          if [ -z "$LATEST_TAG" ]; then
+            VERSION="v${CURRENT_YEAR}.${CURRENT_MONTH}.0"
+            echo "🆕 No existing tags for this month, starting with: $VERSION"
+          else
+            LAST_PATCH=$(echo $LATEST_TAG | awk -F. '{print $3}')
+            NEW_PATCH=$((LAST_PATCH + 1))
+            VERSION="v${CURRENT_YEAR}.${CURRENT_MONTH}.${NEW_PATCH}"
+            echo "⬆️ Incrementing from $LATEST_TAG to $VERSION"
+          fi
+        fi
+
+        # Tag'in zaten var olup olmadığını kontrol et
+        if git rev-parse "$VERSION" >/dev/null 2>&1; then
+          echo "❌ Error: Tag $VERSION already exists!"
+          exit 1
         fi
 
         echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "🎯 Calculated version: $VERSION"
+        echo "✅ Final version: $VERSION"
 
     - name: Get current date
       id: date
-      run: echo "current_date=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+      run: echo "current_date=$(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
 
     - name: Setup Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.21'
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
     - name: Install Mingw for Windows cross-compilation
       run: |
@@ -87,59 +108,93 @@ jobs:
         sudo apt-get install -y gcc-mingw-w64
 
     - name: Install dependencies
-      run: |
-        make setup
+      run: make setup
 
     - name: Build for Linux and Windows
-      run: |
-        make build
+      run: make build
 
-    - name: Create Linux package
+    - name: Create release packages
       run: |
         mkdir -p ./release_packages
+        
+        # Linux package
         cp ./debug/${{ env.BINARY_NAME }} ./${{ env.BINARY_NAME }}
         chmod +x ./${{ env.BINARY_NAME }}
         zip -j ./release_packages/folderhost-linux-amd64.zip ./${{ env.BINARY_NAME }}
         rm ./${{ env.BINARY_NAME }}
-        echo "📦 Linux package created"
-
-    - name: Create Windows package
-      run: |
+        echo "✅ Linux package created"
+        
+        # Windows package
         cp ./debug/${{ env.BINARY_NAME }}.exe ./${{ env.BINARY_NAME }}.exe
         zip -j ./release_packages/folderhost-windows-amd64.zip ./${{ env.BINARY_NAME }}.exe
         rm ./${{ env.BINARY_NAME }}.exe
-        echo "📦 Windows package created"
+        echo "✅ Windows package created"
 
-    - name: List release packages
-      run: ls -la ./release_packages/
+    - name: Verify packages
+      run: |
+        echo "📦 Release packages:"
+        ls -lh ./release_packages/
+        echo ""
+        echo "📊 Package sizes:"
+        du -h ./release_packages/*
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.version }}
         name: Release ${{ steps.version.outputs.version }}
         body: |
-          🚀 Automatic Build Release
-          Version: ${{ steps.version.outputs.version }}
-          Date: ${{ steps.date.outputs.current_date }}
+          🚀 **Folderhost Release ${{ steps.version.outputs.version }}**
           
-          ## 📦 Download Packages
+          📅 Release Date: ${{ steps.date.outputs.current_date }}
           
-          - **Linux**: [`folderhost-linux-amd64.zip`](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/folderhost-linux-amd64.zip) - Linux x86_64 binary
-          - **Windows**: [`folderhost-windows-amd64.zip`](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/folderhost-windows-amd64.zip) - Windows x86_64 executable
+          ## 📦 Downloads
           
-          ## 🔧 Installation
+          | Platform | Download | Description |
+          |----------|----------|-------------|
+          | 🐧 Linux | [`folderhost-linux-amd64.zip`](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/folderhost-linux-amd64.zip) | Linux x86_64 binary |
+          | 🪟 Windows | [`folderhost-windows-amd64.zip`](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/folderhost-windows-amd64.zip) | Windows x86_64 executable |
           
-          1. Download the zip file for your operating system
-          2. Extract the binary
-          3. Place the binary into folder
-          4. Run the application
-          5. Configure the config.yml file
-          6. Restart the application
+          ## 🔧 Quick Start
+          
+          ### Linux / macOS
+          ```bash
+          # Download and extract
+          wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/folderhost-linux-amd64.zip
+          unzip folderhost-linux-amd64.zip
+          chmod +x folderhost
+          
+          # Run
+          ./folderhost
+          ```
+          
+          ### Windows
+          ```powershell
+          # Download, extract, and run
+          # Edit config.yml as needed
+          ./folderhost.exe
+          ```
+          
+          ## ⚙️ Configuration
+          
+          1. Extract the downloaded archive
+          2. Run the application once to generate `config.yml`
+          3. Edit `config.yml` to customize settings
+          4. Restart the application
+          
+          ---
+          
+          💡 For issues and questions, please visit the [GitHub Issues](https://github.com/${{ github.repository }}/issues) page.
         files: |
           ./release_packages/folderhost-linux-amd64.zip
           ./release_packages/folderhost-windows-amd64.zip
         draft: false
         prerelease: false
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Release summary
+      run: |
+        echo "🎉 Release ${{ steps.version.outputs.version }} created successfully!"
+        echo "📍 URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.version }}"
