@@ -63,8 +63,13 @@ func main() {
 
 	config := &config.Config
 	var portInt int = config.Port
-	if portInt == 0 {
-		portInt = 5000
+	if portInt == 0 || !utils.IsPortAvailable(portInt) {
+		log.Printf("Your port %d is busy! Searching for another port...", portInt)
+		var err error
+		portInt, err = utils.FindAvailablePort(5000, 6000)
+		if err != nil {
+			log.Printf("%v", err)
+		}
 	}
 	var PORT string = fmt.Sprintf(":%d", portInt)
 
