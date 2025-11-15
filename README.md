@@ -2,7 +2,30 @@
 
 **Self-hosted cloud platform in a single binary** - Share files, collaborate in real-time, and manage users with zero dependencies.
 
+> 🚀 **No installation required** - Download and run on Windows or Linux
+
 ---
+
+## 📥 Quick Start
+
+**[⬇️ Download Latest Release](https://github.com/MertJSX/folderhost-go/releases/latest)**
+
+### Windows
+```powershell
+# Download the .exe, then:
+folderhost.exe
+```
+
+### Linux
+```bash
+# Download and extract
+wget https://github.com/MertJSX/folderhost/releases/download/v25.11.1/folderhost-linux-amd64.zip
+unzip folderhost-linux-amd64.zip
+chmod +x folderhost
+
+# Run
+./folderhost
+```
 
 ## ✨ Features
 
