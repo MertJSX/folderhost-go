@@ -61,6 +61,8 @@ chmod +x folderhost
 
 ## Default config.yml
 
+⚠️ **Important:** Change `secret_jwt_key` and admin password before using!
+
 <details>
   <summary>Show config</summary>
 
@@ -124,3 +126,26 @@ log_activities: true
 # Clears logs automatically after some days. If you want to disable it set the value to 0.
 clear_logs_after: 7 # Days
 ```
+</details>
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## 📝 License
+
+[MIT License](LICENSE)
+
+---
+
+## 🙏 Credits
+
+Built with ❤️ by [MertJSX](https://github.com/MertJSX)
+
+**Tech Stack:**
+- Backend: Go
+- Frontend: React + TypeScript + Vite
+- Editor: Monaco Editor
+- Database: SQLite
