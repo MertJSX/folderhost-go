@@ -27,8 +27,6 @@ func Image(c *fiber.Ctx) error {
 	path = fmt.Sprintf("%s%s", config.Config.Folder, path)
 	fileinfo, err := os.Stat(path)
 
-	fmt.Println(path)
-
 	if os.IsNotExist(err) {
 		return c.JSON(
 			fiber.Map{"err": "Path does not exist!"},
@@ -61,6 +59,12 @@ func Image(c *fiber.Ctx) error {
 	if !allowedExtensions[ext] {
 		return c.JSON(
 			fiber.Map{"err": "Item is not an image!"},
+		)
+	}
+
+	if fileinfo.Size() > 8*1024*1024 {
+		return c.JSON(
+			fiber.Map{"err": "Too large size!"},
 		)
 	}
 
