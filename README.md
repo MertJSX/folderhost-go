@@ -27,6 +27,19 @@ chmod +x folderhost
 ./folderhost
 ```
 
+---
+
+## 📊 Why FolderHost?
+
+| Feature | FolderHost | Nextcloud | FileRun |
+|---------|-----------|-----------|---------|
+| Single Binary | ✅ | ❌ | ❌ |
+| Zero Dependencies | ✅ | ❌ | ❌ |
+| Real-time Editing | ✅ | ❌ | ❌ |
+| Easy Setup | ✅ | ❌ | ❌ |
+
+---
+
 ## ✨ Features
 
 ### 🚀 Core
@@ -59,9 +72,11 @@ chmod +x folderhost
 
 ---
 
-## Default config.yml
+## ⚙️ Configuration
 
-⚠️ **Important:** Change `secret_jwt_key` and admin password before using!
+On first run, a `config.yml` file will be created. Edit it to customize:
+
+⚠️ **Important:** Change `secret_jwt_key` and admin password before starting to use!
 
 <details>
   <summary>Show config</summary>
