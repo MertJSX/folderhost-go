@@ -63,10 +63,7 @@ const ShowDisabled: React.FC<ShowDisabledProps> = ({ setShowDisabled }) => {
     }, []);
 
     useEffect(() => {
-        console.log(Cookies.get("show-disabled"));
-        console.log(typeof Cookies.get("show-disabled"));
         let option = Cookies.get("show-disabled");
-
 
         if (option !== undefined) {
             if (option === "true") {

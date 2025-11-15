@@ -38,5 +38,7 @@ export interface ExplorerContextType {
         scrollIndex: React.MutableRefObject<number>,
         isDirLoading: boolean,
         showCreateItemMenu: boolean,
-        setShowCreateItemMenu: React.Dispatch<React.SetStateAction<boolean>>
+        setShowCreateItemMenu: React.Dispatch<React.SetStateAction<boolean>>,
+        disableCaching: boolean,
+        setDisableCaching: React.Dispatch<React.SetStateAction<boolean>>
 }

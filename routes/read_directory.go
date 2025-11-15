@@ -24,6 +24,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	path := c.Query("folder")
 	mode := c.Query("mode")
+	caching := c.Query("caching")
 
 	if mode != "Quality mode" && mode != "Optimized mode" {
 		mode = "Optimized mode"
@@ -61,16 +62,18 @@ func ReadDirectory(c *fiber.Ctx) error {
 		ok = false
 	}
 
-	if mode == "Quality mode" && dirCache.StorageInfo && ok {
-		return c.Status(200).JSON(fiber.Map{
-			"items":         dirCache.Items,
-			"directoryInfo": dirCache.DirectoryInfo,
-		})
-	} else if ok && mode != "Quality mode" {
-		return c.Status(200).JSON(fiber.Map{
-			"items":         dirCache.Items,
-			"directoryInfo": dirCache.DirectoryInfo,
-		})
+	if caching != "false" {
+		if mode == "Quality mode" && dirCache.StorageInfo && ok {
+			return c.Status(200).JSON(fiber.Map{
+				"items":         dirCache.Items,
+				"directoryInfo": dirCache.DirectoryInfo,
+			})
+		} else if ok && mode != "Quality mode" {
+			return c.Status(200).JSON(fiber.Map{
+				"items":         dirCache.Items,
+				"directoryInfo": dirCache.DirectoryInfo,
+			})
+		}
 	}
 
 	trimmedPath := func() string {
@@ -80,6 +83,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 			return dirPath
 		}
 	}
+
 	cleanedPath := filepath.Clean(trimmedPath())
 	folderName := filepath.Base(cleanedPath)
 	dirPath = utils.ReplacePathPrefix(dirPath, fmt.Sprintf("%s/", config.Folder))
@@ -109,11 +113,19 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	directoryInfo.Id = -1
 
-	cache.DirectoryCache.Set(pathCacheName, types.ReadDirCache{
-		Items:         data,
-		DirectoryInfo: directoryInfo,
-		StorageInfo:   mode == "Quality mode",
-	}, 600*time.Second)
+	if caching == "false" {
+		cache.DirectoryCache.SetWithoutEventTriggering(pathCacheName, types.ReadDirCache{
+			Items:         data,
+			DirectoryInfo: directoryInfo,
+			StorageInfo:   mode == "Quality mode",
+		}, 600*time.Second)
+	} else {
+		cache.DirectoryCache.Set(pathCacheName, types.ReadDirCache{
+			Items:         data,
+			DirectoryInfo: directoryInfo,
+			StorageInfo:   mode == "Quality mode",
+		}, 600*time.Second)
+	}
 
 	return c.JSON(
 		fiber.Map{

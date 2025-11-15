@@ -1,11 +1,11 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AllOptions from './AllOptions.jsx';
 import { IoMdSettings } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowDown } from "react-icons/fa";
 import ExplorerContext from '../../utils/ExplorerContext';
 import { type ExplorerContextType } from '../../types/ExplorerContextType';
+import SettingsMenu from '../minimal/SettingsMenu/SettingsMenu.js';
 
 
 const OptionsBar = () => {
@@ -13,7 +13,7 @@ const OptionsBar = () => {
     const navigate = useNavigate();
     const buttonSize = 20;
     const {
-        path, setPath, readDir, setShowDisabled
+        path, setPath, readDir
     } = useContext<ExplorerContextType>(ExplorerContext)
     return (
         <div className='flex flex-col justify-center w-11/12 mx-auto pt-5 gap-5 p-2'>
@@ -50,11 +50,11 @@ const OptionsBar = () => {
                     className='sm:ml-5 inline-flex justify-between items-center w-full sm:w-48 px-3 py-2 text-left text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none'
                     onClick={() => { setSettings(!settings) }}>
                     <IoMdSettings size={buttonSize} />
-                    Options
+                    Settings
                     {settings ? <FaArrowDown size={buttonSize - 5} /> : <FaArrowLeft size={buttonSize - 5} />}
                 </button>
             </div>
-            <AllOptions isOpen={settings} setShowDisabled={setShowDisabled} />
+            <SettingsMenu isOpen={settings} setIsOpen={setSettings} />
         </div>
     )
 }

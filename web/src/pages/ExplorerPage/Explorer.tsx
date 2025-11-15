@@ -24,6 +24,7 @@ const ExplorerPage: React.FC = () => {
   const [path, setPath] = useState(params.path || './');
   const [permissions, setPermissions] = useState<AccountPermissions | null>(null);
   const [showDisabled, setShowDisabled] = useState(Cookies.get("show-disabled") === "true");
+  const [disableCaching, setDisableCaching] = useState(Cookies.get("disable-caching") === "true");
   const [directory, setDir] = useState<DirectoryItem[]>([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const [directoryInfo, setDirectoryInfo] = useState<DirectoryItem | null>(null);
@@ -328,7 +329,7 @@ const ExplorerPage: React.FC = () => {
     if (asParentPath && path !== "./") {
       scrollIndex.current = 0;
       setPath(getParent(path));
-      axiosInstance.get(`/explorer/read-dir?folder=${getParent(path).slice(1)}&mode=${Cookies.get("mode") || "Optimized mode"}`
+      axiosInstance.get(`/explorer/read-dir?folder=${getParent(path).slice(1)}&mode=${Cookies.get("mode") || "Optimized mode"}${disableCaching ? "&caching=false" : ""}`
       )
         .then((data) => {
           if (data.data.items != null) {
@@ -347,7 +348,7 @@ const ExplorerPage: React.FC = () => {
         })
       return;
     } else if (pathInput === undefined && !asParentPath) {
-      axiosInstance.get(`/explorer/read-dir?folder=${path.slice(1)}&mode=${Cookies.get("mode") || "Optimized mode"}`
+      axiosInstance.get(`/explorer/read-dir?folder=${path.slice(1)}&mode=${Cookies.get("mode") || "Optimized mode"}${disableCaching ? "&caching=false" : ""}`
       ).then((data) => {
         setIsEmpty(data.data.items == null);
         if (data.data.items != null) {
@@ -365,7 +366,7 @@ const ExplorerPage: React.FC = () => {
       return;
     } else if (pathInput) {
       scrollIndex.current = 0;
-      axiosInstance.get(`/explorer/read-dir?folder=${pathInput.slice(1)}&mode=${Cookies.get("mode") || "Optimized mode"}`
+      axiosInstance.get(`/explorer/read-dir?folder=${pathInput.slice(1)}&mode=${Cookies.get("mode") || "Optimized mode"}${disableCaching ? "&caching=false" : ""}`
       ).then((data) => {
         setPath(pathInput)
         setIsEmpty(data.data.items == null);
@@ -435,7 +436,9 @@ const ExplorerPage: React.FC = () => {
     scrollIndex: scrollIndex,
     isDirLoading: isDirLoading,
     showCreateItemMenu: showCreateItemMenu,
-    setShowCreateItemMenu: setShowCreateItemMenu
+    setShowCreateItemMenu: setShowCreateItemMenu,
+    disableCaching: disableCaching,
+    setDisableCaching: setDisableCaching
   };
 
   return (
