@@ -79,7 +79,6 @@ jobs:
           fi
         fi
 
-        # Tag'in zaten var olup olmadığını kontrol et
         if git rev-parse "$VERSION" >/dev/null 2>&1; then
           echo "❌ Error: Tag $VERSION already exists!"
           exit 1
@@ -157,7 +156,7 @@ jobs:
           
           ## 🔧 Quick Start
           
-          ### Linux / macOS
+          ### Linux
           ```bash
           # Download and extract
           wget https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/folderhost-linux-amd64.zip
@@ -172,7 +171,7 @@ jobs:
           ```powershell
           # Download, extract, and run
           # Edit config.yml as needed
-          ./folderhost.exe
+          folderhost.exe # Or just double click
           ```
           
           ## ⚙️ Configuration
