@@ -102,6 +102,10 @@ func main() {
 		return routes.ReadFile(c)
 	})
 
+	app.Get("/api/image/:path", func(c *fiber.Ctx) error {
+		return routes.Image(c)
+	})
+
 	app.Post("/api/verify-password", func(c *fiber.Ctx) error {
 		return routes.VerifyPassword(c)
 	})
