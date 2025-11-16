@@ -66,7 +66,7 @@ chmod +x folderhost
 ## 🖥️ Web Panel
 
 ### Explorer
-<img width="600px" src="https://github.com/user-attachments/assets/9c2825fa-08ac-4eb8-9767-0a0ba3029046" width="700px">
+<img width="600px" alt="image" src="https://github.com/user-attachments/assets/cc85a58c-3a25-4341-86d8-7dfac9bca41d" />
 
 ### Collaborative Code Editor
 <img width="600px" alt="image" src="https://github.com/user-attachments/assets/04286979-6bd9-4c02-92a1-b994242fc576" />
