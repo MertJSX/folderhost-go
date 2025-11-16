@@ -13,7 +13,7 @@ const Login = () => {
 
     async function verifyPassword(e: React.FormEvent) {
         e.preventDefault();
-        
+
         if (!username || !password) {
             setErr("Please fill in all fields");
             return;
@@ -47,15 +47,13 @@ const Login = () => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-slate-900">
-            <form 
+            <form
                 onSubmit={verifyPassword}
                 className="relative flex flex-col p-10 gap-6 rounded-xl w-full max-w-md bg-slate-800 border border-slate-700 shadow-2xl"
             >
                 {/* Logo/Icon */}
                 <div className="flex flex-col items-center gap-3 mb-2">
-                    <div className="p-3 bg-sky-600 rounded-xl shadow-lg">
-                        <FaFolder className="w-9 h-9 text-white" />
-                    </div>
+                    <img src='/favicon.png' width={100} alt='' />
                     <h1 className="text-center font-extrabold text-4xl italic text-white select-none">
                         FolderHost
                     </h1>
@@ -70,7 +68,7 @@ const Login = () => {
                         </p>
                     </div>
                 )}
-                
+
                 {/* Username Input */}
                 <div className="flex flex-col gap-2">
                     <label htmlFor="username" className="text-slate-300 text-sm font-medium pl-1">
@@ -92,7 +90,7 @@ const Login = () => {
                         />
                     </div>
                 </div>
-                
+
                 {/* Password Input */}
                 <div className="flex flex-col gap-2">
                     <label htmlFor="password" className="text-slate-300 text-sm font-medium pl-1">
@@ -113,7 +111,7 @@ const Login = () => {
                         />
                     </div>
                 </div>
-                
+
                 {/* Submit Button */}
                 <button
                     type="submit"
