@@ -20,7 +20,7 @@ folderhost.exe
 ### Linux
 ```bash
 # Download and extract
-wget https://github.com/MertJSX/folderhost/releases/download/v25.11.1/folderhost-linux-amd64.zip
+wget https://github.com/MertJSX/folderhost/releases/latest/download/folderhost-linux-amd64.zip
 unzip folderhost-linux-amd64.zip
 chmod +x folderhost
 
