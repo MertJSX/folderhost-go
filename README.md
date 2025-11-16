@@ -1,4 +1,5 @@
-# 📁 FolderHost
+<img width="439" height="90" alt="folderhost-logo" src="https://github.com/user-attachments/assets/5b7610d1-e94d-43c4-a79e-69a8999b9eae" />
+
 
 **Self-hosted cloud platform in a single binary** - Share files, collaborate in real-time, and manage users with zero dependencies.
 
