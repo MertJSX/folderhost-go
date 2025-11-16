@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react"
-import Header from "../../components/Header/Header"
 import moment from "moment";
 import axiosInstance from "../../utils/axiosInstance"
 import { FaFolder, FaFileAlt, FaTrash, FaSync } from "react-icons/fa";
@@ -142,7 +141,7 @@ const Recovery: React.FC = () => {
                         {/* Header Section */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-blue-500 rounded-lg">
+                                <div className="p-3 bg-sky-500 rounded-lg">
                                     <FaArrowRotateLeft size={28} className="text-white" />
                                 </div>
                                 <div>
@@ -187,13 +186,13 @@ const Recovery: React.FC = () => {
                                     <article
                                         onClick={() => setRecordInfo(record)}
                                         key={record.id}
-                                        className={`flex items-center p-3 bg-gray-700 rounded border-2 cursor-pointer transition-all hover:border-blue-400 hover:translate-x-1 ${recordInfo?.id === record.id
-                                            ? 'border-blue-500 bg-gray-500'
+                                        className={`flex items-center p-3 bg-gray-700 rounded border-2 cursor-pointer transition-all hover:border-sky-400 hover:translate-x-1 ${recordInfo?.id === record.id
+                                            ? 'border-sky-500 bg-gray-500'
                                             : 'border-gray-600'
                                             }`}
                                     >
                                         {record.isDirectory ? (
-                                            <FaFolder size={logoSize} className='mx-3 text-blue-400' />
+                                            <FaFolder size={logoSize} className='mx-3 text-sky-400' />
                                         ) : (
                                             <FaFileAlt size={logoSize} className='mx-3 text-gray-300' />
                                         )}

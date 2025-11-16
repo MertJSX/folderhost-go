@@ -28,7 +28,7 @@ const RecoveryRecordInfo: React.FC<RecoveryRecordInfoProps> = ({
                 {/* Header Section */}
                 <div className="flex flex-col items-center text-center mb-4">
                     {recordInfo.isDirectory ? (
-                        <FaFolder size={logoSize} className='text-blue-400 mb-3' />
+                        <FaFolder size={logoSize} className='text-sky-400 mb-3' />
                     ) : (
                         <FaFileAlt size={logoSize} className='text-gray-300 mb-3' />
                     )}

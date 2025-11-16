@@ -141,7 +141,7 @@ const FileExplorer: React.FC = () => {
       {/* Header Section */}
       <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-blue-500 rounded-lg">
+          <div className="p-3 bg-sky-500 rounded-lg">
             <MdExplore size={24} className="text-white" />
           </div>
           <div>

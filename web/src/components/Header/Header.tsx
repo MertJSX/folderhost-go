@@ -51,18 +51,13 @@ const Header = () => {
             <section className='hidden md:flex flex-row items-center justify-between w-full px-6 py-2'>
                 {/* Logo Section */}
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-500 rounded-lg">
-                        <FaFolder className="w-5 h-5 text-white" />
-                    </div>
-                    <h1 className="font-extrabold text-2xl italic select-none text-white">
-                        FolderHost
-                    </h1>
+                    <img src='/folderhost-logo.png' width={200} alt='' />
                 </div>
 
                 {/* User Info Section */}
                 <div className="flex items-center gap-3 px-4 py-3 rounded-lg">
                     <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-blue-500 rounded-full">
+                        <div className="p-1.5 bg-sky-500 rounded-full">
                             <FaUser className="w-3.5 h-3.5 text-sky-400" />
                         </div>
                         <span className="text-white font-medium">{username}</span>
@@ -85,12 +80,7 @@ const Header = () => {
             <section className='flex md:hidden flex-col items-center w-full px-6 py-3'>
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-blue-500 rounded-lg">
-                        <FaFolder className="w-5 h-5 text-white" />
-                    </div>
-                    <h1 className="font-extrabold text-2xl italic select-none text-white">
-                        FolderHost
-                    </h1>
+                    <img src='/folderhost-logo.png' width={200} alt='' />
                 </div>
 
                 {/* User Info and Logout */}
@@ -98,7 +88,7 @@ const Header = () => {
                     {/* User Info */}
                     <div className="flex items-center gap-3 px-4 py-2 rounded-lg">
                         <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-blue-500 rounded-full">
+                            <div className="p-1.5 bg-sky-500 rounded-full">
                                 <FaUser className="w-3.5 h-3.5 text-sky-400" />
                             </div>
                             <span className="text-white font-medium">{username}</span>

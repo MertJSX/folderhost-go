@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react"
-import Header from "../../components/Header/Header"
 import moment from "moment";
 import axiosInstance from "../../utils/axiosInstance"
 import { FaSync, FaSearch, FaCalendar, FaUser, FaPencilAlt, FaList } from "react-icons/fa";
@@ -103,7 +102,7 @@ const Logs: React.FC = () => {
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-blue-500 rounded-lg">
+                        <div className="p-3 bg-sky-500 rounded-lg">
                             <FaPencilAlt size={28} className="text-white" />
                         </div>
                         <div>
@@ -138,7 +137,7 @@ const Logs: React.FC = () => {
                             <select
                                 value={usernameFilter}
                                 onChange={(e) => setUsernameFilter(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500"
+                                className="w-full h-11 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
                             >
                                 <option value="">All Users</option>
                                 {uniqueUsernames.map(username => (
@@ -155,7 +154,7 @@ const Logs: React.FC = () => {
                                 type="date"
                                 value={dateFilter}
                                 onChange={(e) => setDateFilter(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500"
+                                className="w-full h-11 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
                             />
                         </div>
 
@@ -191,11 +190,11 @@ const Logs: React.FC = () => {
                         filteredLogs.map((log, index) => (
                             <article
                                 key={log.id || index}
-                                className="grid grid-cols-12 gap-4 items-center p-4 bg-gray-700 rounded-lg border border-gray-600 hover:border-blue-400 transition-all"
+                                className="grid grid-cols-12 gap-4 items-center p-4 bg-gray-700 rounded-lg border border-gray-600 hover:border-sky-400 transition-all"
                             >
                                 <div className="col-span-2">
                                     <div className="flex items-center gap-2">
-                                        <FaUser className="text-blue-400 text-sm" />
+                                        <FaUser className="text-sky-400 text-sm" />
                                         <Link to={`/users/${log.username}`} className="text-white font-medium truncate cursor-pointer hover:text-cyan-200">
                                             {log.username}
                                         </Link>
