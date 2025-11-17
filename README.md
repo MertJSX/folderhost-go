@@ -1,15 +1,48 @@
-<img width="440" height="90" alt="image" src="https://github.com/user-attachments/assets/85e0398c-c0f6-4f44-8c67-13d141cf1335" />
+<p align="center">
+  <img width="500" height="160" alt="image" src="https://github.com/user-attachments/assets/85e0398c-c0f6-4f44-8c67-13d141cf1335" />
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/language-Go-blue?style=flat-square" alt="Go Language">
+  <a href="https://github.com/kullaniciAdi/projeAdi/releases">
+    <img src="https://img.shields.io/github/v/release/MertJSX/folderhost?style=flat-square" alt="Latest Release">
+  </a>
+  <a href="LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/MertJSX/folderhost">
+  </a>
+  <a href="https://github.com/MertJSX/folderhost/releases">
+    <img alt="Downloads" src="https://img.shields.io/github/downloads/MertJSX/folderhost/total?style=flat-square">
+  </a>
+</p>
+
+<p align="center">
+  <strong>Self-hosted cloud platform in a single binary</strong> - Share files, collaborate in real-time, and manage users with zero dependencies.
+</p>
 
 
-**Self-hosted cloud platform in a single binary** - Share files, collaborate in real-time, and manage users with zero dependencies.
+> 🚀 **No dependency required** - Download and run on Windows or Linux
 
-> 🚀 **No installation required** - Download and run on Windows or Linux
+---
+
+## 🖥️ Screenshots
+
+<img width="700px" alt="image" src="https://github.com/user-attachments/assets/cc85a58c-3a25-4341-86d8-7dfac9bca41d" />
+
+<details>
+  <summary>More Screenshots</summary>
+    <img width="700px" alt="image" src="https://github.com/user-attachments/assets/04286979-6bd9-4c02-92a1-b994242fc576" />
+    <img width="700px" alt="image" src="https://github.com/user-attachments/assets/ca462852-6fae-4ec2-9479-af7f3e3a09a1" />
+</details>
+
 
 ---
 
 ## 📥 Quick Start
 
-**[⬇️ Download Latest Release](https://github.com/MertJSX/folderhost-go/releases/latest)**
+> ⚠️ **Beta Notice:** FolderHost is currently in **beta**. Some features may be incomplete or subject to change.
+ 
+<br>
+
+[![Download Latest Release](https://img.shields.io/github/v/release/MertJSX/folderhost?style=for-the-badge&logo=github&label=Download&color=2ea44f)](https://github.com/MertJSX/folderhost/releases/latest)
 
 ### Windows
 ```powershell
@@ -18,6 +51,7 @@ folderhost.exe
 ```
 
 ### Linux
+> Just copy and paste this and folderhost will start working. It's around 23 mb for linux.
 ```bash
 # Download and extract
 wget https://github.com/MertJSX/folderhost/releases/latest/download/folderhost-linux-amd64.zip
@@ -31,17 +65,19 @@ chmod +x folderhost
 ---
 
 ## 📊 Why FolderHost?
+Shortly this is lightweight alternative to Nextcloud folder sharing system.
 
-| Feature | FolderHost | Nextcloud | FileRun |
-|---------|-----------|-----------|---------|
-| Single Binary | ✅ | ❌ | ❌ |
-| Zero Dependencies | ✅ | ❌ | ❌ |
-| Real-time Editing | ✅ | ❌ | ❌ |
-| Easy Setup | ✅ | ❌ | ❌ |
+| Feature | FolderHost | Nextcloud |
+|---------|-----------|-----------|
+| Single Binary | ✅ | ❌ |
+| Zero Dependencies | ✅ | ❌ |
+| Real-time Editing | ✅ | ❌ |
+| Easy Setup | ✅ | ❌ |
 
 ---
 
 ## ✨ Features
+> If you encounter any issues or have questions, please feel free to open an [issue](https://github.com/MertJSX/folderhost/issues) or provide feedback. Your input is highly appreciated!
 
 ### 🚀 Core
 - **Single Binary Deployment** - No dependencies, just run
@@ -61,15 +97,6 @@ chmod +x folderhost
 - Audit logs for all activities
 - Configurable storage limits
 
----
-
-## 🖥️ Web Panel
-
-### Explorer
-<img width="600px" alt="image" src="https://github.com/user-attachments/assets/cc85a58c-3a25-4341-86d8-7dfac9bca41d" />
-
-### Collaborative Code Editor
-<img width="600px" alt="image" src="https://github.com/user-attachments/assets/04286979-6bd9-4c02-92a1-b994242fc576" />
 
 ---
 
