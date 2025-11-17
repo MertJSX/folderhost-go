@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import Header from "../../components/Header/Header"
 import { FaUserFriends, FaUserPlus } from "react-icons/fa"
 import { useState } from "react"
 import { type Account } from "../../types/Account"

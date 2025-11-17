@@ -1,10 +1,11 @@
 import Cookies from 'js-cookie';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { MdExplore, MdMiscellaneousServices } from "react-icons/md";
-import { FaUserFriends, FaPencilAlt, FaFolder, FaUser, FaBars, FaTimes } from "react-icons/fa"
+import { FaUserFriends, FaPencilAlt, FaUser, FaBars, FaTimes } from "react-icons/fa"
 import { FaArrowRotateLeft } from "react-icons/fa6"
 import { useCallback, useLayoutEffect, useState } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
+import fullLogo from '../../assets/folderhost-logo.webp'
 
 const Header = () => {
     let navigate = useNavigate();
@@ -51,7 +52,7 @@ const Header = () => {
             <section className='hidden md:flex flex-row items-center justify-between w-full px-6 py-2'>
                 {/* Logo Section */}
                 <div className="flex items-center gap-3">
-                    <img src='/folderhost-logo.png' width={200} alt='' />
+                    <img src={fullLogo} width={200} alt='' />
                 </div>
 
                 {/* User Info Section */}
@@ -80,7 +81,7 @@ const Header = () => {
             <section className='flex md:hidden flex-col items-center w-full px-6 py-3'>
                 {/* Logo */}
                 <div className="flex items-center gap-3 mb-4">
-                    <img src='/folderhost-logo.png' width={200} alt='' />
+                    <img src={fullLogo} width={200} alt='' />
                 </div>
 
                 {/* User Info and Logout */}

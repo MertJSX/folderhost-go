@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { FaLock, FaUser, FaFolder } from 'react-icons/fa';
+import { FaLock, FaUser } from 'react-icons/fa';
+import logo from "../../assets/favicon.webp"
 
 const Login = () => {
     const [username, setUsername] = useState<string>("");
@@ -53,7 +54,7 @@ const Login = () => {
             >
                 {/* Logo/Icon */}
                 <div className="flex flex-col items-center gap-3 mb-2">
-                    <img src='/favicon.png' width={100} alt='' />
+                    <img src={logo} width={100} alt='' />
                     <h1 className="text-center font-extrabold text-4xl italic text-white select-none">
                         FolderHost
                     </h1>
