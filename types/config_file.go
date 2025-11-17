@@ -15,3 +15,8 @@ type ConfigFile struct {
 	LogActivities   bool    `yaml:"log_activities"`
 	ClearLogsAfter  int     `yaml:"clear_logs_after"`
 }
+
+func (c *ConfigFile) GetScopedFolder(scope string) string {
+	// for example: ./host + /mert
+	return c.Folder + scope
+}

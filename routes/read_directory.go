@@ -22,6 +22,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		)
 	}
 
+	scope := c.Locals("account").(types.Account).Scope
 	path := c.Query("folder")
 	mode := c.Query("mode")
 	caching := c.Query("caching")
@@ -31,7 +32,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 	}
 
 	config := &config.Config
-	var dirPath string = fmt.Sprintf("%s%s", config.Folder, path)
+	var dirPath string = fmt.Sprintf("%s%s", config.GetScopedFolder(scope), path)
 	directoryData, err := os.Stat(dirPath)
 	var pathCacheName string = dirPath
 
@@ -86,7 +87,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 
 	cleanedPath := filepath.Clean(trimmedPath())
 	folderName := filepath.Base(cleanedPath)
-	dirPath = utils.ReplacePathPrefix(dirPath, fmt.Sprintf("%s/", config.Folder))
+	dirPath = utils.ReplacePathPrefix(dirPath, fmt.Sprintf("%s/", config.GetScopedFolder(scope)))
 
 	directoryInfo := types.DirectoryItem{
 		Name:         folderName,
@@ -104,7 +105,7 @@ func ReadDirectory(c *fiber.Ctx) error {
 		directoryInfo.StorageLimit = "UNLIMITED"
 	}
 
-	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.Folder, path), mode)
+	data, mainDirectorySize := utils.GetDirectoryItems(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), path), mode, scope)
 
 	if mainDirectorySize != 0 {
 		directoryInfo.SizeBytes = mainDirectorySize

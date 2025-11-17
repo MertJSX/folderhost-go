@@ -4,6 +4,7 @@ type Account struct {
 	ID          *int               `yaml:"id,omitempty" json:"id,omitempty"`
 	Username    string             `yaml:"username" json:"username"`
 	Email       string             `yaml:"email" json:"email"`
+	Scope       string             `yaml:"scope" json:"scope"`
 	Password    string             `yaml:"password" json:"password"`
 	Permissions AccountPermissions `yaml:"permissions" json:"permissions"`
 }

@@ -10,6 +10,7 @@ func GetAll() ([]types.Account, error) {
 		SELECT
 			username,
 			email,
+			scope,
 			read_directories,
 			read_files,
 			create_permission,
@@ -42,6 +43,7 @@ func GetAll() ([]types.Account, error) {
 		err := rows.Scan(
 			&u.Username,
 			&u.Email,
+			&u.Scope,
 			&u.Permissions.ReadDirectories,
 			&u.Permissions.ReadFiles,
 			&u.Permissions.Create,

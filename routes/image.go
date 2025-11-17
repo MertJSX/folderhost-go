@@ -20,11 +20,12 @@ func Image(c *fiber.Ctx) error {
 	}
 
 	var path string = c.Params("path")
+	scope := c.Locals("account").(types.Account).Scope
 	path, err := url.QueryUnescape(path)
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{"err": "Invalid path encoding"})
 	}
-	path = fmt.Sprintf("%s%s", config.Config.Folder, path)
+	path = fmt.Sprintf("%s%s", config.Config.GetScopedFolder(scope), path)
 	fileinfo, err := os.Stat(path)
 
 	if os.IsNotExist(err) {

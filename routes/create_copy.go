@@ -21,13 +21,14 @@ func CreateCopy(c *fiber.Ctx) error {
 		extname    string            = ""
 		account    types.Account     = c.Locals("account").(types.Account)
 		config     *types.ConfigFile = &config.Config
+		scope      string            = c.Locals("account").(types.Account).Scope
 	)
 
 	if !account.Permissions.Copy {
 		return c.Status(403).JSON(fiber.Map{"err": "No permission"})
 	}
 
-	pathStat, err := os.Stat(fmt.Sprintf("%s%s", config.Folder, path))
+	pathStat, err := os.Stat(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), path))
 
 	if os.IsNotExist(err) {
 		return c.Status(400).JSON(fiber.Map{"err": "The item doesn't exist!"})
@@ -51,19 +52,19 @@ func CreateCopy(c *fiber.Ctx) error {
 			}
 		}
 
-		for utils.IsExistingPath(config.Folder + copyPath) {
+		for utils.IsExistingPath(config.GetScopedFolder(scope) + copyPath) {
 			index++
 			copyPath = fmt.Sprintf("%s/%s (%d)%s", parentPath, basename, index, extname)
 		}
 
-		err := utils.CopyFile(config.Folder+path, config.Folder+copyPath)
+		err := utils.CopyFile(config.GetScopedFolder(scope)+path, config.GetScopedFolder(scope)+copyPath)
 
 		if err != nil {
 			return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
 		}
 	} else {
 		if config.StorageLimit != "" {
-			folderSize, _, err := utils.GetDirectorySize(config.Folder + path)
+			folderSize, _, err := utils.GetDirectorySize(config.GetScopedFolder(scope) + path)
 			if err != nil {
 				return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
 			}
@@ -79,12 +80,12 @@ func CreateCopy(c *fiber.Ctx) error {
 
 		copyPath := fmt.Sprintf("%s/%s", parentPath, basename)
 
-		for utils.IsExistingPath(config.Folder + copyPath) {
+		for utils.IsExistingPath(config.GetScopedFolder(scope) + copyPath) {
 			index++
 			copyPath = fmt.Sprintf("%s/%s (%d)", parentPath, basename, index)
 		}
 
-		if err := utils.CopyDirectory(config.Folder+path, config.Folder+copyPath); err != nil {
+		if err := utils.CopyDirectory(config.GetScopedFolder(scope)+path, config.GetScopedFolder(scope)+copyPath); err != nil {
 			return c.Status(520).JSON(fiber.Map{"err": "Internal server error!"})
 		}
 

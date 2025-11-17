@@ -19,6 +19,7 @@ const EditUser = () => {
         id: 1,
         username: "",
         email: "",
+        scope: "",
         password: "",
         permissions: {
             read_directories: false,
@@ -132,6 +133,13 @@ const EditUser = () => {
                                 placeholder="Email"
                                 value={user.email}
                                 onChange={(e) => handleInputChange('email', e.target.value)}
+                                className="bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-500 focus:border-blue-400 focus:outline-none transition-colors placeholder-gray-400"
+                            />
+                            <input
+                                type="text"
+                                placeholder="Scope ( Ex: /foldername | Not required )"
+                                value={user.scope}
+                                onChange={(e) => handleInputChange('scope', e.target.value)}
                                 className="bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-500 focus:border-blue-400 focus:outline-none transition-colors placeholder-gray-400"
                             />
                             <input

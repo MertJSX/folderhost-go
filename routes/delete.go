@@ -24,7 +24,8 @@ func Delete(c *fiber.Ctx) error {
 
 	config := &config.Config
 
-	path := fmt.Sprintf("%s%s", config.Folder, c.Query("path"))
+	scope := c.Locals("account").(types.Account).Scope
+	path := fmt.Sprintf("%s%s", config.GetScopedFolder(scope), c.Query("path"))
 
 	pathStat, err := os.Stat(path)
 
@@ -34,7 +35,7 @@ func Delete(c *fiber.Ctx) error {
 		)
 	}
 
-	if path == fmt.Sprintf("%s/", config.Folder) {
+	if path == fmt.Sprintf("%s/", config.GetScopedFolder(scope)) {
 		return c.JSON(
 			fiber.Map{"err": "You can't delete the main folder!"},
 		)

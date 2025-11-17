@@ -26,6 +26,7 @@ func CreateUser(user *types.Account) error {
 			username,
 			password,
 			email,
+			scope,
 			read_directories,
 			read_files,
 			create_permission,
@@ -42,7 +43,7 @@ func CreateUser(user *types.Account) error {
 			use_recovery_permission,
 			read_users_permission,
 			edit_users_permission
-		) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 
 	if err != nil {
@@ -55,6 +56,7 @@ func CreateUser(user *types.Account) error {
 		user.Username,
 		user.Password,
 		user.Email,
+		user.Scope,
 		user.Permissions.ReadDirectories,
 		user.Permissions.ReadFiles,
 		user.Permissions.Create,

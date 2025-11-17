@@ -21,7 +21,8 @@ func GetDownloadLink(c *fiber.Ctx) error {
 	}
 
 	filepath := c.Query("filepath")
-	filepath = fmt.Sprintf("%s%s", config.Config.Folder, filepath)
+	scope := c.Locals("account").(types.Account).Scope
+	filepath = fmt.Sprintf("%s%s", config.Config.GetScopedFolder(scope), filepath)
 
 	fileinfo, err := os.Stat(filepath)
 

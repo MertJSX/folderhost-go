@@ -25,8 +25,9 @@ secret_jwt_key: "you must change it" # Example: 5asdasd1asd
 # Admin account properties
 admin:
   username: "admin"
-  email: "example@email.com"
   password: "123"
+  email: "example@email.com"
+  scope: "" # for example "/yourfolder", this attribute will set a specific location for user and user can't escape it
   permissions:
     read_directories: true
     read_files: true

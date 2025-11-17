@@ -15,7 +15,7 @@ type directoryID struct {
 	fullPath string
 }
 
-func GetDirectoryItems(directoryPath string, mode string) ([]types.DirectoryItem, int64) {
+func GetDirectoryItems(directoryPath string, mode string, scope string) ([]types.DirectoryItem, int64) {
 	var directoryItems []types.DirectoryItem
 	var directoryIDs []directoryID
 
@@ -37,7 +37,7 @@ func GetDirectoryItems(directoryPath string, mode string) ([]types.DirectoryItem
 	for i, file := range files {
 		fullPath := filepath.Join(directoryPath, file.Name())
 		parentPath := GetParentPath(fullPath)
-		parentPath = ReplaceHostPrefix(parentPath)
+		parentPath = ReplaceHostPrefix(parentPath, scope)
 		if parentPath[len(parentPath)-1] != '/' {
 			parentPath += "/"
 		}

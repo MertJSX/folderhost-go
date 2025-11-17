@@ -12,8 +12,10 @@ import (
 )
 
 func HandleUnzip(c *websocket.Conn, mt int, message types.EditorChange) {
-	src := config.Config.Folder + message.Path
-	dest := fmt.Sprintf("%s%s/%s", config.Config.Folder, utils.GetParentPath(message.Path), utils.GetPureFileName(message.Path))
+	var account types.Account = c.Locals("account").(types.Account)
+
+	src := config.Config.GetScopedFolder(account.Scope) + message.Path
+	dest := fmt.Sprintf("%s%s/%s", config.Config.GetScopedFolder(account.Scope), utils.GetParentPath(message.Path), utils.GetPureFileName(message.Path))
 
 	for index := 1; utils.IsExistingPath(dest); index++ {
 		dest = fmt.Sprintf("%s (%d)", dest, index)

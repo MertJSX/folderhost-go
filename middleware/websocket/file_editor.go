@@ -51,7 +51,7 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 			return nil
 		}
 
-		path := config.Config.Folder + "/" + message.Path
+		path := config.Config.GetScopedFolder(account.Scope) + "/" + message.Path
 
 		if !utils.IsSafePath(path) {
 			c.Close()

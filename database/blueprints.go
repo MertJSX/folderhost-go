@@ -12,6 +12,7 @@ func CreateUsersTable() {
 			username TEXT NOT NULL UNIQUE,
 			password TEXT NULL,
 			email TEXT NULL,
+			scope TEXT NULL,
 			read_directories BOOLEAN DEFAULT FALSE,
         	read_files BOOLEAN DEFAULT FALSE,
         	create_permission BOOLEAN DEFAULT FALSE,

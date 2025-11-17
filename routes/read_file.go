@@ -27,12 +27,13 @@ func ReadFile(c *fiber.Ctx) error {
 	}
 
 	path = c.Query("filepath")
+	scope := c.Locals("account").(types.Account).Scope
 
-	if utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.Folder, path)) {
+	if utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), path)) {
 		return c.Status(400).JSON(fiber.Map{"err": "Filepath is not existing!"})
 	}
 
-	itemStat, err = os.Stat(fmt.Sprintf("%s%s", config.Folder, path))
+	itemStat, err = os.Stat(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), path))
 
 	fileName = itemStat.Name()
 	lastModified = itemStat.ModTime().GoString()
@@ -53,7 +54,7 @@ func ReadFile(c *fiber.Ctx) error {
 		return c.Status(413).JSON(fiber.Map{"err": "Not enough storage space to edit! Try to close unused CodeEditor windows. Each code editor window guarantees itself 200 KB of space."})
 	}
 
-	content, err := os.ReadFile(fmt.Sprintf("%s%s", config.Folder, path))
+	content, err := os.ReadFile(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), path))
 
 	if err != nil {
 		fmt.Printf("Error while reading file: %v\n", err)

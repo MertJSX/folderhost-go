@@ -16,6 +16,7 @@ import (
 
 func HandleWebsocket(c *websocket.Conn) {
 	var path string = c.Params("path")
+	var account types.Account = c.Locals("account").(types.Account)
 
 	path, err := url.PathUnescape(path)
 	if err != nil {
@@ -24,7 +25,7 @@ func HandleWebsocket(c *websocket.Conn) {
 	}
 
 	config := &config.Config
-	path = config.Folder + path
+	path = config.GetScopedFolder(account.Scope) + path
 
 	if !utils.IsSafePath(path) {
 		c.Close()
@@ -51,10 +52,9 @@ func HandleWebsocket(c *websocket.Conn) {
 
 	defer updateClientsCount(path)
 	defer utils.RemoveClient(c)
-	// defer log.Printf("WebSocket disconnected - User: %s, Path: %s\n", c.Locals("username").(string), path)
 	defer c.Close()
 
-	var username string = c.Locals("username").(string)
+	var username string = account.Username
 	defer utils.TriggerPendingLog(username, path)
 
 	_, ok := cache.EditorWatcherCache.Get(path)
@@ -76,7 +76,6 @@ func HandleWebsocket(c *websocket.Conn) {
 	for {
 		mt, msg, err := c.ReadMessage()
 		if err != nil {
-			// log.Println("WebSocket read error:", err)
 			return
 		}
 

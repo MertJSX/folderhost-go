@@ -30,12 +30,14 @@ func Rename(c *fiber.Ctx) error {
 		)
 	}
 
+	scope := c.Locals("account").(types.Account).Scope
+
 	if requestType != "move" && requestType != "rename" {
 		return c.Status(400).JSON(fiber.Map{"err": "Bad request!"})
 	}
 
 	if requestType == "move" {
-		newFilepathStat, err := os.Stat(fmt.Sprintf("%s%s", config.Folder, newFilepath))
+		newFilepathStat, err := os.Stat(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), newFilepath))
 		if os.IsNotExist(err) {
 			return c.Status(400).JSON(fiber.Map{"err": "Newpath is not existing!"})
 		}
@@ -48,11 +50,11 @@ func Rename(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"err": "Same location!"})
 	}
 
-	if utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.Folder, oldFilepath)) {
+	if utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), oldFilepath)) {
 		return c.Status(400).JSON(fiber.Map{"err": "Filepath doesn't exist!"})
 	}
 
-	if requestType == "rename" && utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.Folder, utils.GetParentPath(newFilepath))) {
+	if requestType == "rename" && utils.IsNotExistingPath(fmt.Sprintf("%s%s", config.GetScopedFolder(scope), utils.GetParentPath(newFilepath))) {
 		return c.Status(400).JSON(fiber.Map{"err": "New parent directory doesn't exist!"})
 	}
 
@@ -60,8 +62,8 @@ func Rename(c *fiber.Ctx) error {
 
 	if requestType == "move" {
 		// Check possible existing item in the new directory with the same name
-		oldPathPlaceholder := fmt.Sprintf("%s%s", config.Folder, oldFilepath)
-		newPathPlaceholder := fmt.Sprintf("%s%s/%s", config.Folder, newFilepath, filename)
+		oldPathPlaceholder := fmt.Sprintf("%s%s", config.GetScopedFolder(scope), oldFilepath)
+		newPathPlaceholder := fmt.Sprintf("%s%s/%s", config.GetScopedFolder(scope), newFilepath, filename)
 		fmt.Printf("Old path: %s\n", oldPathPlaceholder)
 		fmt.Printf("New path: %s\n", newPathPlaceholder)
 		if !utils.IsNotExistingPath(newPathPlaceholder) {
@@ -80,8 +82,8 @@ func Rename(c *fiber.Ctx) error {
 			Description: fmt.Sprintf("%s moved an item %s -> %s", c.Locals("account").(types.Account).Username, oldFilepath, newFilepath+"/"+filename),
 		})
 	} else {
-		oldPathPlaceholder := fmt.Sprintf("%s/%s", config.Folder, filename)
-		newPathPlaceholder := fmt.Sprintf("%s%s", config.Folder, newFilepath)
+		oldPathPlaceholder := fmt.Sprintf("%s/%s", config.GetScopedFolder(scope), filename)
+		newPathPlaceholder := fmt.Sprintf("%s%s", config.GetScopedFolder(scope), newFilepath)
 		if !utils.IsNotExistingPath(newPathPlaceholder) {
 			return c.Status(500).JSON(fiber.Map{"err": "The destination already has an item named!"})
 		}

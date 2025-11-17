@@ -19,6 +19,7 @@ func CreateItem(c *fiber.Ctx) error {
 		account  types.Account     = c.Locals("account").(types.Account)
 		config   *types.ConfigFile = &config.Config
 		isFolder bool
+		scope    string = c.Locals("account").(types.Account).Scope
 	)
 
 	if !account.Permissions.Create {
@@ -27,7 +28,7 @@ func CreateItem(c *fiber.Ctx) error {
 		)
 	}
 
-	if utils.IsExistingPath(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName)) {
+	if utils.IsExistingPath(fmt.Sprintf("%s%s/%s", config.GetScopedFolder(scope), itemPath, itemName)) {
 		return c.Status(400).JSON(
 			fiber.Map{"err": "Item already exists!"},
 		)
@@ -42,7 +43,7 @@ func CreateItem(c *fiber.Ctx) error {
 	}
 
 	if isFolder {
-		err = os.Mkdir(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName), 0777)
+		err = os.Mkdir(fmt.Sprintf("%s%s/%s", config.GetScopedFolder(scope), itemPath, itemName), 0777)
 		if err != nil {
 			return c.Status(500).JSON(
 				fiber.Map{"err": "Internal server error!"},
@@ -59,7 +60,7 @@ func CreateItem(c *fiber.Ctx) error {
 			fiber.Map{"err": "The folder was created successfully!"},
 		)
 	} else {
-		err = os.WriteFile(fmt.Sprintf("%s%s/%s", config.Folder, itemPath, itemName), nil, 0777)
+		err = os.WriteFile(fmt.Sprintf("%s%s/%s", config.GetScopedFolder(scope), itemPath, itemName), nil, 0777)
 		if err != nil {
 			return c.Status(500).JSON(
 				fiber.Map{"err": "Internal server error!"},
