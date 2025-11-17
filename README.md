@@ -77,7 +77,6 @@ Shortly this is lightweight alternative to Nextcloud folder sharing system.
 ---
 
 ## ✨ Features
-> If you encounter any issues or have questions, please feel free to open an [issue](https://github.com/MertJSX/folderhost/issues) or provide feedback. Your input is highly appreciated!
 
 ### 🚀 Core
 - **Single Binary Deployment** - No dependencies, just run
@@ -101,6 +100,7 @@ Shortly this is lightweight alternative to Nextcloud folder sharing system.
 ---
 
 ## ⚙️ Configuration
+> If you encounter any issues or have questions, please feel free to open an [issue](https://github.com/MertJSX/folderhost/issues) or provide feedback. Your input is highly appreciated!
 
 On first run, a `config.yml` file will be created. Edit it to customize:
 
