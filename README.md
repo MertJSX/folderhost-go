@@ -121,7 +121,7 @@ On first run, a `config.yml` file will be created. Edit it to customize:
 # /_/       /_/  /_/  By MertJSX
 #
 # Thanks for using my application!!! Please report if you catch any bugs!
-# Here is the GitHub page of Folderhost: https://github.com/MertJSX/folderhost-go
+# Here is the GitHub page of Folderhost: https://github.com/MertJSX/folderhost
 #
 
 # Port is required. Don't delete it!
@@ -140,8 +140,9 @@ secret_jwt_key: "you must change it" # Example: 5asdasd1asd
 # Admin account properties
 admin:
   username: "admin"
-  email: "example@email.com"
   password: "123"
+  email: "example@email.com"
+  scope: "" # for example "/yourfolder", this attribute will set a specific location for user and user can't escape it
   permissions:
     read_directories: true
     read_files: true
