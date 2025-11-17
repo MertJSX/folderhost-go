@@ -44,13 +44,13 @@
 
 [![Download Latest Release](https://img.shields.io/github/v/release/MertJSX/folderhost?style=for-the-badge&logo=github&label=Download&color=2ea44f)](https://github.com/MertJSX/folderhost/releases/latest)
 
-### Windows
+### 🪟 Windows
 ```powershell
 # Download the .exe, then:
 folderhost.exe
 ```
 
-### Linux
+### 🐧 Linux
 > Just copy and paste this and folderhost will start working. It's around 23 mb for linux.
 ```bash
 # Download and extract
@@ -65,10 +65,13 @@ chmod +x folderhost
 ---
 
 ## 📊 Why FolderHost?
-Shortly this is lightweight alternative to Nextcloud folder sharing system.
+**Lightweight alternative to Nextcloud** - Get the same file sharing features without the complexity.
 
 | Feature | FolderHost | Nextcloud |
 |---------|-----------|-----------|
+| **Binary Size** | 22MB | 200MB+ |
+| **Dependencies** | None | PHP+Database |
+| **Setup Time** | 30 seconds | 10+ minutes |
 | Single Binary | ✅ | ❌ |
 | Zero Dependencies | ✅ | ❌ |
 | Real-time Editing | ✅ | ❌ |
