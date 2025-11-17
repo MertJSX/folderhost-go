@@ -69,7 +69,7 @@ chmod +x folderhost
 
 | Feature | FolderHost | Nextcloud |
 |---------|-----------|-----------|
-| **Binary Size** | 22MB | 200MB+ |
+| **Binary Size** | 23MB | 200MB+ |
 | **Dependencies** | None | PHP+Database |
 | **Setup Time** | 30 seconds | 10+ minutes |
 | Single Binary | ✅ | ❌ |
