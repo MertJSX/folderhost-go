@@ -3,7 +3,7 @@
 </p>
 <p align="center">
   <img src="https://img.shields.io/badge/language-Go-blue?style=flat-square" alt="Go Language">
-  <a href="https://github.com/kullaniciAdi/projeAdi/releases">
+  <a href="https://github.com/MertJSX/folderhost/releases">
     <img src="https://img.shields.io/github/v/release/MertJSX/folderhost?style=flat-square" alt="Latest Release">
   </a>
   <a href="LICENSE">
