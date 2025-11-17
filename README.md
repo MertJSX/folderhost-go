@@ -171,6 +171,18 @@ clear_logs_after: 7 # Days
 ```
 </details>
 
+**🎯 Default Access**
+
+Once running, open your browser to:
+```
+http://localhost:5000
+```
+
+Default credentials: `admin` / `123` (⚠️ **Change immediately!**)
+
+[📖 View All Releases](https://github.com/MertJSX/folderhost/releases) • [🐛 Report Issues](https://github.com/MertJSX/folderhost/issues)
+
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
