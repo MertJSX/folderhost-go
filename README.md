@@ -21,7 +21,7 @@
 
 > 🚀 **No Dependencies Required!**
 
-> ⚡ **Lightweight:** Linux **22MB** • Windows **37MB**
+> ⚡ **Lightweight:** Linux **23MB** • Windows **37MB**
 
 ---
 
