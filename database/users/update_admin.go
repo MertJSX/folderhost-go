@@ -1,6 +1,9 @@
 package users
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+
 	"github.com/MertJSX/folder-host-go/database"
 	"github.com/MertJSX/folder-host-go/types"
 )
@@ -31,10 +34,13 @@ func UpdateAdmin(user *types.Account) error {
 		WHERE id = 1
 	`
 
+	hash := sha256.Sum256([]byte(user.Password))
+	hashString := hex.EncodeToString(hash[:])
+
 	_, err := database.DB.Exec(
 		query,
 		user.Username,
-		user.Password,
+		hashString,
 		user.Email,
 		user.Scope,
 		user.Permissions.ReadDirectories,

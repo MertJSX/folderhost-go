@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"time"
 
 	"github.com/MertJSX/folder-host-go/database/users"
@@ -76,7 +78,9 @@ func CheckAuth(c *fiber.Ctx) error {
 	}
 
 	if cacheAccount, ok := cache.SessionCache.Get(username); ok {
-		if controlPassword && password != cacheAccount.Password {
+		hash := sha256.Sum256([]byte(password))
+		hashString := hex.EncodeToString(hash[:])
+		if controlPassword && hashString != cacheAccount.Password {
 			return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
 		}
 
@@ -90,7 +94,10 @@ func CheckAuth(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"err": "account not found"})
 	}
 
-	if controlPassword && password != foundAccount.Password {
+	hash := sha256.Sum256([]byte(password))
+	hashString := hex.EncodeToString(hash[:])
+
+	if controlPassword && hashString != foundAccount.Password {
 		return c.Status(401).JSON(fiber.Map{"err": "wrong password"})
 	}
 

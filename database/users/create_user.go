@@ -1,6 +1,8 @@
 package users
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log"
 
@@ -52,9 +54,12 @@ func CreateUser(user *types.Account) error {
 
 	defer stmt.Close()
 
+	hash := sha256.Sum256([]byte(user.Password))
+	hashString := hex.EncodeToString(hash[:])
+
 	_, err = stmt.Exec(
 		user.Username,
-		user.Password,
+		hashString,
 		user.Email,
 		user.Scope,
 		user.Permissions.ReadDirectories,

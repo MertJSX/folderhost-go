@@ -47,12 +47,6 @@ func EditUser(c *fiber.Ctx) error {
 		)
 	}
 
-	if requestBody.User.Password == "" {
-		return c.Status(400).JSON(
-			fiber.Map{"err": "Password is missing."},
-		)
-	}
-
 	err = users.UpdateUser(*requestBody.User.ID, &requestBody.User)
 
 	if err != nil {

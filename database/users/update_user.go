@@ -9,7 +9,6 @@ func UpdateUser(id int, user *types.Account) error {
 	const query = `
 		UPDATE users SET
 			username = ?,
-			password = ?,
 			email = ?,
 			scope = ?,
 			read_directories = ?,
@@ -34,7 +33,6 @@ func UpdateUser(id int, user *types.Account) error {
 	_, err := database.DB.Exec(
 		query,
 		user.Username,
-		user.Password,
 		user.Email,
 		user.Scope,
 		user.Permissions.ReadDirectories,

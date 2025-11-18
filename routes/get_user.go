@@ -23,6 +23,7 @@ func GetUser(c *fiber.Ctx) error {
 	}
 
 	if cacheUser, ok := cache.SessionCache.Get(username); ok {
+		cacheUser.Password = ""
 		return c.Status(200).JSON(
 			fiber.Map{"user": cacheUser},
 		)
@@ -49,6 +50,8 @@ func GetUser(c *fiber.Ctx) error {
 			fiber.Map{"err": "Unknown error!"},
 		)
 	}
+
+	user.Password = ""
 
 	return c.Status(200).JSON(
 		fiber.Map{"user": user},
