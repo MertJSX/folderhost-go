@@ -3,6 +3,7 @@ package logs
 import (
 	"fmt"
 	"log"
+	"regexp"
 
 	"github.com/MertJSX/folder-host-go/database"
 	"github.com/MertJSX/folder-host-go/types"
@@ -18,6 +19,8 @@ func CreateLog(logItem types.AuditLog) error {
 		log.Fatal(err)
 		return fmt.Errorf("Begin transaction error: %w", err)
 	}
+
+	logItem.Description = normalizeSlashes(logItem.Description)
 
 	stmt, err := tx.Prepare(`
 		INSERT INTO logs(
@@ -48,4 +51,9 @@ func CreateLog(logItem types.AuditLog) error {
 	}
 
 	return nil
+}
+
+func normalizeSlashes(input string) string {
+	re := regexp.MustCompile(`/+`)
+	return re.ReplaceAllString(input, "/")
 }
