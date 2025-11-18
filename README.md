@@ -19,7 +19,9 @@
 </p>
 
 
-> 🚀 **No dependency required** - Download and run on Windows or Linux
+> 🚀 **No Dependencies Required!**
+
+> ⚡ **Lightweight:** Linux **22MB** • Windows **37MB**
 
 ---
 
@@ -36,10 +38,10 @@
 
 ---
 
-## 📥 Quick Start
+## 📦 Download & Run (Recommended)
 
 > ⚠️ **Beta Notice:** FolderHost is currently in **beta**. Some features may be incomplete or subject to change.
- 
+
 <br>
 
 [![Download Latest Release](https://img.shields.io/github/v/release/MertJSX/folderhost?style=for-the-badge&logo=github&label=Download&color=2ea44f)](https://github.com/MertJSX/folderhost/releases/latest)
@@ -51,7 +53,7 @@ folderhost.exe
 ```
 
 ### 🐧 Linux
-> Just copy and paste this and folderhost will start working. It's around 23 mb for linux.
+> 🚀 Just copy and paste this and folderhost will start working. It's around 23 mb for linux.
 ```bash
 # Download and extract
 wget https://github.com/MertJSX/folderhost/releases/latest/download/folderhost-linux-amd64.zip
