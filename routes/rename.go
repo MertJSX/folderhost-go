@@ -82,7 +82,7 @@ func Rename(c *fiber.Ctx) error {
 			Description: fmt.Sprintf("%s moved an item %s -> %s", c.Locals("account").(types.Account).Username, oldFilepath, newFilepath+"/"+filename),
 		})
 	} else {
-		oldPathPlaceholder := fmt.Sprintf("%s/%s", config.GetScopedFolder(scope), filename)
+		oldPathPlaceholder := fmt.Sprintf("%s/%s", config.GetScopedFolder(scope), oldFilepath)
 		newPathPlaceholder := fmt.Sprintf("%s%s", config.GetScopedFolder(scope), newFilepath)
 		if !utils.IsNotExistingPath(newPathPlaceholder) {
 			return c.Status(500).JSON(fiber.Map{"err": "The destination already has an item named!"})
@@ -91,7 +91,7 @@ func Rename(c *fiber.Ctx) error {
 		err := os.Rename(oldPathPlaceholder, newPathPlaceholder)
 
 		if err != nil {
-			fmt.Printf("Error while renaming item: %s", err)
+			fmt.Printf("Error while renaming item: %s\n", err)
 			return c.Status(520).JSON(fiber.Map{"err": "Unknown error while renaming item"})
 		}
 
