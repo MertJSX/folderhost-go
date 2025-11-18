@@ -18,6 +18,7 @@ const Logs: React.FC = () => {
     const [dateFilter, setDateFilter] = useState<string>("");
 
     useEffect(() => {
+        document.title = "Logs - folderhost"
         getLogs();
     }, []);
 

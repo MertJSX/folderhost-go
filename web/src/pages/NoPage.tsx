@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom'
 import { BsEmojiFrown } from "react-icons/bs";
+import { useEffect } from 'react';
 
 const NoPage = () => {
+    useEffect(() => {
+        document.title = "folderhost"
+    }, [])
     return (
         <div>
             <div className="flex flex-col justify-center items-center bg-gray-800 border border-sky-600 w-1/2 mx-auto rounded-lg p-5 gap-4 mt-32">

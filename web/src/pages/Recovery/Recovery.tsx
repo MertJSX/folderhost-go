@@ -18,6 +18,7 @@ const Recovery: React.FC = () => {
     const logoSize = 20;
 
     useEffect(() => {
+        document.title = "Recovery - folderhost"
         getRecoveryRecords()
     }, [])
 

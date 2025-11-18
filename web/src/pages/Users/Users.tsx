@@ -5,6 +5,7 @@ import LoadingComponent from "../../components/LoadingComponent/LoadingComponent
 import type { Account } from "../../types/Account";
 import { FaUserFriends, FaUserPlus, FaUser, FaEnvelope, FaSearch, FaUsers } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { IoTelescopeSharp } from "react-icons/io5";
 
 const Users: React.FC = () => {
   const navigate = useNavigate()
@@ -16,6 +17,7 @@ const Users: React.FC = () => {
   const [message, setMessage] = useState<string>("")
 
   useEffect(() => {
+    document.title = "Users - folderhost"
     getUsersData()
   }, [])
 
@@ -73,7 +75,7 @@ const Users: React.FC = () => {
                   <p className="text-gray-400">Manage system users</p>
                 </div>
               </div>
-              
+
               <Link
                 to="/users/new"
                 className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 min-w-[140px] justify-center"
@@ -92,7 +94,7 @@ const Users: React.FC = () => {
                   <span className="text-white">{users.length}</span>
                 </div>
               </div>
-              
+
               <div className="relative w-full sm:w-64">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
@@ -124,7 +126,7 @@ const Users: React.FC = () => {
                           <FaUser className="text-white" />
                         </div>
                       </div>
-                      
+
                       {/* User Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -132,12 +134,22 @@ const Users: React.FC = () => {
                             <div className="text-lg font-semibold text-cyan-200 group-hover:text-cyan-100 transition-colors">
                               {user.username}
                             </div>
-                            <div className="flex items-center gap-2 text-gray-300 mt-1">
-                              <FaEnvelope className="text-gray-400 text-sm" />
-                              <span className="text-sm break-words">{user.email}</span>
-                            </div>
+                            {
+                              user.scope ?
+                                <div className="flex items-center gap-2 text-gray-300 mt-1">
+                                  <IoTelescopeSharp className="text-gray-400 text-sm" />
+                                  <span className="text-sm break-words">{user.scope}</span>
+                                </div> : null
+                            }
+                            {
+                              user.email ?
+                                <div className="flex items-center gap-2 text-gray-300 mt-1">
+                                  <FaEnvelope className="text-gray-400 text-sm" />
+                                  <span className="text-sm break-words">{user.email}</span>
+                                </div> : null
+                            }
                           </div>
-                          
+
                           {/* Arrow Indicator */}
                           <div className="text-gray-400 group-hover:text-sky-400 transition-colors">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +168,7 @@ const Users: React.FC = () => {
                       {searchTerm ? "No users found" : "No users available"}
                     </h2>
                     <p className="text-center max-w-md">
-                      {searchTerm 
+                      {searchTerm
                         ? "Try adjusting your search terms to find what you're looking for."
                         : "You don't have permission to access users."
                       }

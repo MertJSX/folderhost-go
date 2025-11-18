@@ -1,8 +1,12 @@
 import { MdMiscellaneousServices } from "react-icons/md";
 import { FaClock, FaTools } from "react-icons/fa";
 import { BiSolidParty } from "react-icons/bi";
+import { useEffect } from "react";
 
 const Services = () => {
+  useEffect(() => {
+    document.title = "Services - folderhost"
+  },[])
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-120px)] bg-slate-900 p-6">
       <div className="flex flex-col items-center gap-6 bg-slate-800 border border-slate-700 rounded-xl p-4 max-w-2xl w-full shadow-2xl">

@@ -17,6 +17,7 @@ const UploadFile = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
   useEffect(() => {
+    document.title = "Upload - folderhost"
     if (!Cookies.get("ip") && !Cookies.get("token")) {
       navigate("/login");
     }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -45,6 +45,10 @@ const Login = () => {
             setIsLoading(false);
         }
     }
+
+    useEffect(() => {
+        document.title = "Login - folderhost"
+    }, [])
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-slate-900">

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { FaUserFriends, FaUserPlus } from "react-icons/fa"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { type Account } from "../../types/Account"
 import PermissionToggle from "../../components/minimal/PermissionToggle/PermissionToggle"
 import { type AccountPermissions } from "../../types/AccountPermissions"
@@ -36,6 +36,10 @@ const NewUser = () => {
     }
   })
 
+  useEffect(() => {
+    document.title = "New User - folderhost"
+  }, [])
+
   const handleInputChange = (field: keyof Omit<Account, 'permissions'>, value: string) => {
     setUser(prev => ({
       ...prev,
@@ -62,7 +66,6 @@ const NewUser = () => {
       if (err?.response?.data?.err) {
         setError(err.response.data.err)
       }
-      
     })
   }
 

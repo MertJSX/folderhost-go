@@ -160,6 +160,7 @@ const ExplorerPage: React.FC = () => {
   }
 
   useEffect(() => {
+    document.title = "Explorer - folderhost"
     if (error) {
       setMessageBoxMsg(error)
       setMessageBoxIsErr(true)

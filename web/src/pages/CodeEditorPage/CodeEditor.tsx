@@ -111,6 +111,12 @@ const CodeEditorPage = () => {
     }
 
     useEffect(() => {
+        if (fileTitle) {
+            document.title = `${fileTitle} - folderhost`
+        }
+    }, [fileTitle])
+
+    useEffect(() => {
         if (Cookies.get("token")) {
             readFile()
         } else {

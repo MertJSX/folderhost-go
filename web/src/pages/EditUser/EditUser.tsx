@@ -42,6 +42,7 @@ const EditUser = () => {
     })
 
     useEffect(() => {
+        document.title = "Edit User - folderhost"
         getUserData()
     }, [])
 
