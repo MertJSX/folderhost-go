@@ -199,7 +199,7 @@ const ExplorerPage: React.FC = () => {
     }
     const itemWithPath = item;
     let oldPath = itemWithPath.path.slice(1);
-    let newPath = `${getParent(itemWithPath.path.slice(0, -1))}`; // /${newName}
+    let newPath = `${getParent(itemWithPath.path.slice(0, -1))}`;
     if (newPath.slice(-1) === "/") {
       newPath = newPath + newName
     } else {
@@ -219,6 +219,10 @@ const ExplorerPage: React.FC = () => {
           readDir()
         }
       }).catch((err) => {
+        if (err.response.data.err == "Same location!") {
+          setWaitingResponse(false)
+          return
+        }
         handleError(err)
       })
   }
