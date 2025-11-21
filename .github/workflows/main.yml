@@ -8,9 +8,9 @@ on:
         required: true
         type: choice
         options:
-        - auto     # Otomatik: mevcut ay için patch artırır
-        - major    # Major: yeni ay versiyonu (YY.MM.0)
-        - minor    # Minor: patch versiyonu artırır
+        - auto
+        - major
+        - minor
       custom_version:
         description: 'Custom version (optional, format: vYY.MM.PATCH)'
         required: false
@@ -27,7 +27,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Tüm tag'leri almak için gerekli
+        fetch-depth: 0
 
     - name: Calculate version
       id: version
@@ -57,7 +57,6 @@ jobs:
           fi
         
         elif [[ "${{ github.event.inputs.release_type }}" == "major" ]]; then
-          # Mevcut ayda zaten bir release varsa uyar
           EXISTING_TAG=$(git tag -l "v${CURRENT_YEAR}.${CURRENT_MONTH}.0")
           if [ -n "$EXISTING_TAG" ]; then
             echo "⚠️ Warning: v${CURRENT_YEAR}.${CURRENT_MONTH}.0 already exists!"
