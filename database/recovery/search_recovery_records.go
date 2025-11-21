@@ -7,15 +7,16 @@ import (
 	"github.com/MertJSX/folder-host-go/types"
 )
 
-func SearchRecoveryRecords(limit, skip int) ([]types.RecoveryRecord, error) {
+func SearchRecoveryRecords(limit, skip int, locationPrefix string) ([]types.RecoveryRecord, error) {
 	var foundList []types.RecoveryRecord
 	rows, err := database.DB.Query(`
-		SELECT * FROM recovery ORDER BY created_at DESC LIMIT ? OFFSET ?;
-	`, limit, skip)
+		SELECT * FROM recovery WHERE oldLocation LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?;
+	`, locationPrefix+"%", limit, skip)
 
 	if err != nil {
 		return nil, fmt.Errorf("error while getting recovery records: %v", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var record types.RecoveryRecord

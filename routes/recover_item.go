@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/MertJSX/folder-host-go/database/logs"
 	"github.com/MertJSX/folder-host-go/database/recovery"
@@ -29,12 +30,20 @@ func RecoverItem(c *fiber.Ctx) error {
 		})
 	}
 
+	account := c.Locals("account").(types.Account)
+
 	currentRecord, err := recovery.GetRecoveryRecord(idToInt)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"err": "Error while getting record.",
 		})
+	}
+
+	if !strings.HasPrefix(currentRecord.OldLocation, config.Config.Folder+account.Scope) {
+		return c.Status(403).JSON(
+			fiber.Map{"err": "Out of scope error! No permission!"},
+		)
 	}
 
 	if utils.IsExistingPath(currentRecord.OldLocation) {
@@ -67,7 +76,7 @@ func RecoverItem(c *fiber.Ctx) error {
 		})
 	}
 
-	err = recovery.DeleteRecoveryRecord(idToInt)
+	err = recovery.DeleteRecoveryRecord(idToInt, config.Config.Folder+account.Scope)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

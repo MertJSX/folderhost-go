@@ -7,7 +7,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database"
 )
 
-func DeleteRecoveryRecord(id int) error {
+func DeleteRecoveryRecord(id int, scope string) error {
 	tx, err := database.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -15,7 +15,7 @@ func DeleteRecoveryRecord(id int) error {
 	}
 
 	stmt, err := tx.Prepare(`
-		DELETE FROM recovery WHERE id = ?;
+		DELETE FROM recovery WHERE id = ? AND oldLocation LIKE ?;
 	`)
 
 	if err != nil {
@@ -26,6 +26,7 @@ func DeleteRecoveryRecord(id int) error {
 
 	_, err = stmt.Exec(
 		id,
+		scope+"%",
 	)
 
 	if err != nil {

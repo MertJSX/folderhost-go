@@ -7,6 +7,7 @@ import (
 	"github.com/MertJSX/folder-host-go/database/recovery"
 	"github.com/MertJSX/folder-host-go/types"
 	"github.com/MertJSX/folder-host-go/utils"
+	"github.com/MertJSX/folder-host-go/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -23,7 +24,8 @@ func ResetRecoveryRecords(c *fiber.Ctx) error {
 		})
 	}
 
-	err := recovery.ResetRecoveryRecords()
+	account := c.Locals("account").(types.Account)
+	err := recovery.ResetRecoveryRecords(config.Config.Folder + account.Scope)
 
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
