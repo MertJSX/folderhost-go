@@ -64,8 +64,6 @@ func Rename(c *fiber.Ctx) error {
 		// Check possible existing item in the new directory with the same name
 		oldPathPlaceholder := fmt.Sprintf("%s%s", config.GetScopedFolder(scope), oldFilepath)
 		newPathPlaceholder := fmt.Sprintf("%s%s/%s", config.GetScopedFolder(scope), newFilepath, filename)
-		fmt.Printf("Old path: %s\n", oldPathPlaceholder)
-		fmt.Printf("New path: %s\n", newPathPlaceholder)
 		if !utils.IsNotExistingPath(newPathPlaceholder) {
 			return c.Status(500).JSON(fiber.Map{"err": "The destination already has an item named like that!"})
 		}
