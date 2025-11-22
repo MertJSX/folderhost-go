@@ -52,6 +52,11 @@ cd web && npm run dev
 # Main server
 go run main.go
 ```
+```bash
+# Docker example
+docker compose build
+docker compose up
+```
 5. Open your browser
   - Frontend: http://localhost:5173
   - Main Server: http://localhost:5000
