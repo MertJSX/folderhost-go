@@ -39,6 +39,8 @@ export interface ExplorerContextType {
         isDirLoading: boolean,
         showCreateItemMenu: boolean,
         setShowCreateItemMenu: React.Dispatch<React.SetStateAction<boolean>>,
+        showRenameItemMenu: boolean,
+        setShowRenameItemMenu: React.Dispatch<React.SetStateAction<boolean>>,
         disableCaching: boolean,
         setDisableCaching: React.Dispatch<React.SetStateAction<boolean>>
 }

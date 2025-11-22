@@ -1,10 +1,8 @@
-import Header from '../../components/Header/Header';
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
 import OptionsBar from '../../components/Options/OptionsBar';
 import ItemInfo from '../../components/DirItemInfo/ItemInfo';
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Cookies from 'js-cookie';
-import fileDownload from 'js-file-download';
 import { useParams, useNavigate } from 'react-router-dom';
 import ExplorerContext from '../../utils/ExplorerContext';
 import MessageBox from '../../components/minimal/MessageBox/MessageBox';
@@ -16,6 +14,7 @@ import { type AccountPermissions } from '../../types/AccountPermissions';
 import type { WebSocketResponseType } from '../../types/CodeEditorTypes';
 import { getUserPermissions } from '../../utils/getUserPermissions';
 import CreateDirectoryItem from '../../components/minimal/CreateDirectoryItem/CreateDirectoryItem';
+import RenameDirectoryItem from '../../components/minimal/RenameDirectoryItem/RenameDirectoryItem';
 const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL;
 
 const ExplorerPage: React.FC = () => {
@@ -38,6 +37,7 @@ const ExplorerPage: React.FC = () => {
   const scrollIndex = useRef<number>(0)
   const [isDirLoading, setIsDirLoading] = useState<boolean>(false)
   const [showCreateItemMenu, setShowCreateItemMenu] = useState<boolean>(false);
+  const [showRenameItemMenu, setShowRenameItemMenu] = useState<boolean>(false);
   const [contextMenu, setContextMenu] = useState({
     show: false,
     x: 0,
@@ -442,6 +442,8 @@ const ExplorerPage: React.FC = () => {
     isDirLoading: isDirLoading,
     showCreateItemMenu: showCreateItemMenu,
     setShowCreateItemMenu: setShowCreateItemMenu,
+    showRenameItemMenu: showRenameItemMenu,
+    setShowRenameItemMenu: setShowRenameItemMenu,
     disableCaching: disableCaching,
     setDisableCaching: setDisableCaching
   };
@@ -459,6 +461,7 @@ const ExplorerPage: React.FC = () => {
         >
           <MessageBox message={messageBoxMsg} isErr={messageBoxIsErr} />
           <CreateDirectoryItem />
+          <RenameDirectoryItem />
           <FileExplorer />
           {
             itemInfo && (

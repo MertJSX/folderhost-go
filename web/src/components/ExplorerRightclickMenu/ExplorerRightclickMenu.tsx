@@ -3,6 +3,8 @@ import ExplorerContext from "../../utils/ExplorerContext"
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { FaDownload, FaCopy, FaFileArchive } from "react-icons/fa";
 import ExplorerRMItem from "./ExplorerRMItem";
+import { MdDriveFileRenameOutline } from "react-icons/md";
+
 
 interface ExplorerRightclickMenuProps {
     x: number, y: number
@@ -17,6 +19,7 @@ const ExplorerRightclickMenu: React.FC<ExplorerRightclickMenuProps> = ({ x, y })
         unzipProgress,
         startUnzipping,
         downloadFile,
+        setShowRenameItemMenu,
         downloadProgress } = useContext(ExplorerContext)
     const iconSize = 20;
     return (
@@ -41,6 +44,24 @@ const ExplorerRightclickMenu: React.FC<ExplorerRightclickMenuProps> = ({ x, y })
                             isDisabled={true}
                             title="No permission">
                             <RiDeleteBin6Fill size={iconSize} />Delete
+                        </ExplorerRMItem>
+                        : null
+            }
+
+            {
+                permissions?.rename ?
+                    <ExplorerRMItem
+                        title='Click to rename.'
+                        onClick={() => {
+                            setShowRenameItemMenu(true)
+                        }}>
+                        <MdDriveFileRenameOutline size={iconSize} />Rename
+                    </ExplorerRMItem>
+                    : showDisabled === true ?
+                        <ExplorerRMItem
+                            isDisabled={true}
+                            title="No permission">
+                            <MdDriveFileRenameOutline size={iconSize} />Rename
                         </ExplorerRMItem>
                         : null
             }

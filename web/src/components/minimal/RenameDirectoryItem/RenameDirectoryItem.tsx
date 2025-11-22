@@ -1,28 +1,30 @@
 import { useContext, useEffect } from "react";
 import ExplorerContext from "../../../utils/ExplorerContext";
-import { AiOutlineFileAdd, AiOutlineFolderAdd } from "react-icons/ai";
+import { MdDriveFileRenameOutline } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import { useState } from "react";
 
-const CreateDirectoryItem: React.FC = () => {
-    const { createItem, path, showCreateItemMenu, setShowCreateItemMenu } = useContext(ExplorerContext)
+const RenameDirectoryItem: React.FC = () => {
+    const { renameItem, path, showRenameItemMenu, setShowRenameItemMenu, itemInfo } = useContext(ExplorerContext)
     const [itemName, setItemName] = useState<string>("")
 
     useEffect(() => {
-        setItemName("");
-    }, [showCreateItemMenu])
+        if (itemInfo?.name) {
+            setItemName(itemInfo?.name);
+        }
+    }, [itemInfo])
 
-    return showCreateItemMenu && (
+    return showRenameItemMenu && (
         <section className='bg-black fixed inset-0 flex items-center justify-center w-full bg-opacity-60 z-30 animate-in fade-in duration-200'>
             <div className='flex flex-col bg-slate-800 border border-slate-700 rounded-xl w-full max-w-lg p-6 shadow-2xl animate-in zoom-in-95 duration-200'>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h2 className="text-2xl font-bold text-white">Create New Item</h2>
-                        <p className="text-sm text-slate-400 mt-1">Enter a name for your file or folder</p>
+                        <h2 className="text-2xl font-bold text-white">Rename {itemInfo?.name}</h2>
+                        <p className="text-sm text-slate-400 mt-1">Enter a new name for your {itemInfo?.isDirectory ? "folder" : "file"}</p>
                     </div>
                     <button
-                        onClick={() => setShowCreateItemMenu?.(false)}
+                        onClick={() => setShowRenameItemMenu?.(false)}
                         className="p-2 hover:bg-slate-700 rounded-lg transition-all text-slate-400 hover:text-white"
                         aria-label="Close"
                     >
@@ -33,7 +35,7 @@ const CreateDirectoryItem: React.FC = () => {
                 {/* Input Field */}
                 <div className="mb-6">
                     <label htmlFor="itemName" className="text-slate-300 text-sm font-medium pl-1 mb-2 block">
-                        Item Name
+                        Name
                     </label>
                     <input
                         id="itemName"
@@ -51,33 +53,32 @@ const CreateDirectoryItem: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3">
-                    {itemName != "" ?
                     <div className="flex gap-3">
-                        <button
-                            className='flex gap-2 items-center justify-center flex-1 py-3 px-4 font-semibold rounded-lg transition-all bg-green-600 hover:bg-green-500 active:scale-[0.98] text-white shadow-lg hover:shadow-green-500/20'
-                            onClick={() => {
-                                setShowCreateItemMenu?.(false)
-                                createItem(path, false, itemName)
-                            }}
-                        >
-                            <AiOutlineFileAdd size={22} />
-                            Create File
-                        </button>
-                        <button
-                            className='flex gap-2 items-center justify-center flex-1 py-3 px-4 font-semibold rounded-lg transition-all bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white shadow-lg hover:shadow-sky-500/20'
-                            onClick={() => {
-                                setShowCreateItemMenu?.(false)
-                                createItem(path, true, itemName)
-                            }}
-                        >
-                            <AiOutlineFolderAdd size={22} />
-                            Create Folder
-                        </button>
-                    </div> : null}
-                    
+                        {
+                            itemName != itemInfo?.name && itemName != "" ?
+                                <button
+                                    className='flex gap-2 items-center justify-center flex-1 py-3 px-4 font-semibold rounded-lg transition-all bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white shadow-lg hover:shadow-sky-500/20'
+                                    onClick={() => {
+                                        setShowRenameItemMenu?.(false)
+                                        renameItem(itemInfo, itemName)
+                                    }}
+                                >
+                                    <MdDriveFileRenameOutline size={22} />
+                                    Update
+                                </button> : 
+                                <button
+                                    className='flex gap-2 items-center justify-center flex-1 py-3 px-4 font-semibold rounded-lg transition-all bg-gray-600 opacity-60 text-white shadow-lg cursor-not-allowed'
+                                    disabled
+                                >
+                                    <MdDriveFileRenameOutline size={22} />
+                                    Update
+                                </button>
+                        }
+                    </div>
+
                     <button
                         className='w-full py-3 px-4 font-semibold rounded-lg transition-all bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white active:scale-[0.98]'
-                        onClick={() => setShowCreateItemMenu?.(false)}
+                        onClick={() => setShowRenameItemMenu?.(false)}
                     >
                         Cancel
                     </button>
@@ -87,4 +88,4 @@ const CreateDirectoryItem: React.FC = () => {
     )
 }
 
-export default CreateDirectoryItem
+export default RenameDirectoryItem
